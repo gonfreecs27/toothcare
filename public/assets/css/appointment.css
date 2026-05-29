@@ -1,0 +1,133 @@
+#calendar {
+    min-height: 800px;
+}
+
+.fc {
+    font-family: 'Inter', sans-serif;
+}
+
+.fc-toolbar-title {
+    font-size: 1.4rem !important;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.fc-button {
+    border: none !important;
+    padding: 8px 14px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+.fc-button-primary {
+    background: #2563eb !important;
+}
+
+.fc-button-active {
+    background: #1e40af !important;
+}
+
+.fc-button-primary:hover {
+    background: #1d4ed8 !important;
+}
+
+.fc-daygrid-event {
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 4px 8px !important;
+    font-size: .85rem;
+    font-weight: 600;
+}
+
+.fc-event-title {
+    font-weight: 600;
+}
+
+.fc-day-today {
+    background: #eff6ff !important;
+}
+
+.schedule-legend {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+.legend-item span {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.legend-item.pending span {
+    background: #facc15;
+}
+
+.legend-item.confirmed span {
+    background: #22c55e;
+}
+
+.legend-item.completed span {
+    background: #3b82f6;
+}
+
+.legend-item.cancelled span {
+    background: #ef4444;
+}
+
+.stat-card {
+    padding: 20px;
+    border-radius: 18px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, .04);
+}
+
+.stat-card h6 {
+    margin-bottom: 8px;
+    color: #475569;
+    font-weight: 600;
+}
+
+.stat-card h3 {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.fc-event {
+    border: none !important;
+    padding: 2px 4px;
+    border-radius: 10px;
+    font-size: 13px;
+}
+
+.event-pending {
+    background: #facc15 !important;
+    color: #000 !important;
+}
+
+.event-confirmed {
+    background: #22c55e !important;
+}
+
+.event-completed {
+    background: #3b82f6 !important;
+}
+
+.event-cancelled {
+    background: #ef4444 !important;
+}
+
+.fc-toolbar-title {
+    font-weight: 700;
+}
+
+.fc-daygrid-event {
+    border-radius: 8px;
+}
