@@ -81,7 +81,7 @@ class Dentist extends BaseModel {
     }
 
     public function update($id, $data) {
-        return $this->execute("
+        $this->execute("
             UPDATE dentists
             SET
                 firstname = ?,
@@ -99,6 +99,19 @@ class Dentist extends BaseModel {
             $data['contact'] ?? null,
             $data['status'] ?? 'active',
             $id
+        ]);
+
+        // Update user's name
+        $dentist = $this->find($id);
+
+        $name = trim($data['firstname'] . " " . $data['lastname']);
+        $this->execute("
+            UPDATE users
+            SET name = ?
+            WHERE id = ?
+        ", [
+            $name,
+            $dentist['user_id']
         ]);
     }
 

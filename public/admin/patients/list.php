@@ -3,6 +3,7 @@ require '../../../init.php';
 header('Content-Type: application/json');
 
 try {
+    Core::loadModel("Patient");
     $patientClass = new Patient();
     $patients = $patientClass->list();
     echo json_encode($patients);

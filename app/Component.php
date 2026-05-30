@@ -1,7 +1,7 @@
 <?php
 
 class Component {
-    public static function header($public = false, $title = null) {
+    public static function header($public = false, $title = null, $additional_js = [], $additional_css = []) {
         if ($public) {
             include __DIR__ . "/views/header_public.php";
         } else {

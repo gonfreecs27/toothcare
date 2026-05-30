@@ -1,10 +1,9 @@
 <?php
-
-require_once(__DIR__ . '/../../../models/Dentist.php');
-
+require '../../../init.php';
 header('Content-Type: application/json');
 
 try {
+    Core::loadModel("Dentist");
     $dentistClass = new Dentist();
     $dentists = $dentistClass->list();
     echo json_encode($dentists);

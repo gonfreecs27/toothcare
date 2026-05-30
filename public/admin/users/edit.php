@@ -142,9 +142,7 @@ Component::sidebar();
 
                                 <a href="<?= PROJECT_BASE ?>admin/users/"
                                     class="btn btn-light">
-
                                     Cancel
-
                                 </a>
 
                             </div>

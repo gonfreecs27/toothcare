@@ -1,30 +1,23 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login.php");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/Dentist.php');
-
+Core::loadModel("Dentist");
 $dentistModel = new Dentist();
 
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    header("Location: /admin/dentists");
-    exit;
+    Core::redirect("admin/dentists/");
 }
 
 $errors = [];
-
-// ---------------- GET DATA ----------------
 $dentist = $dentistModel->find($id);
-
 if (!$dentist) {
-    header("Location: /admin/dentists");
-    exit;
+    Core::redirect("admin/dentists/");
 }
 
 // flash message
@@ -42,12 +35,10 @@ $form = [
 
 // ---------------- UPDATE ----------------
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
     foreach ($form as $key => $value) {
         $form[$key] = trim($_POST[$key] ?? $value);
     }
 
-    // ---------------- PROCESS ----------------
     try {
         $dentistModel->update($id, $form);
 
@@ -56,15 +47,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'message' => 'Dentist updated successfully!'
         ];
 
-        header("Location: /admin/dentists/edit?id=" . $id);
-        exit;
+        Core::redirect("admin/dentists/edit?id=" . $id);
     } catch (Exception $e) {
         $errors['global'] = $e->getMessage();
     }
 }
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -76,7 +66,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 <p class="text-muted mb-0">Update dentist and account details</p>
             </div>
 
-            <a href="/admin/dentists" class="btn btn-secondary">
+            <a href="<?= PROJECT_BASE ?>admin/dentists" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
 
@@ -170,6 +160,11 @@ include __DIR__ . '/../../../includes/sidebar.php';
                             <button class="btn btn-primary">
                                 <i class="bi bi-save"></i> Update Dentist
                             </button>
+                            
+                            <a href="<?= PROJECT_BASE ?>admin/dentists/"
+                                class="btn btn-light">
+                                Cancel
+                            </a>
                         </div>
 
                     </div>
@@ -180,5 +175,5 @@ include __DIR__ . '/../../../includes/sidebar.php';
         </div>
 
     </div>
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 </div>

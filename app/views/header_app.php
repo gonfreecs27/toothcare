@@ -34,6 +34,7 @@
     <link rel="stylesheet" href="<?= PROJECT_BASE ?>assets/css/layout.css">
     <link rel="stylesheet" href="<?= PROJECT_BASE ?>assets/css/dashboard.css">
 
+    <script src="<?= PROJECT_BASE ?>assets/js/app.js"></script>
     <?php
     if (isset($additional_css)) {
         foreach ($additional_css as $css) {

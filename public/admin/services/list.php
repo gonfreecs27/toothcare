@@ -1,22 +1,17 @@
 <?php
-session_start();
-
+require '../../../init.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+if (!Permission::hasAccess(['all'])) {
     http_response_code(401);
-
     echo json_encode([
         'error' => 'Unauthorized'
     ]);
-
     exit;
 }
 
-require_once(__DIR__ . '/../../../models/Service.php');
-
 try {
-
+    Core::loadModel("Service");
     $serviceClass = new Service();
 
     $page = max(1, (int) ($_GET['page'] ?? 1));

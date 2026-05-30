@@ -1,19 +1,18 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login.php");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/Dentist.php');
-
+Core::loadModel("Dentist");
 $dentistModel = new Dentist();
 
 $errors = [];
 $success = false;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_POST['name'] = $_POST['firstname'] . ' ' . $_POST['lastname'];
 
     $name = trim($_POST['name'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -27,7 +26,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = $_POST['status'] ?? 'active';
 
     // ---------------- VALIDATION ----------------
-    if ($name === '') $errors[] = "Full name is required.";
     if ($email === '') $errors[] = "Email is required.";
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = "Invalid email format.";
     if ($password === '') $errors[] = "Password is required.";
@@ -59,8 +57,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -72,7 +70,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 <p class="text-muted mb-0">Create dentist account and profile</p>
             </div>
 
-            <a href="/admin/dentists" class="btn btn-secondary">
+            <a href="<?= PROJECT_BASE ?>admin/dentists" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Back
             </a>
         </div>
@@ -81,9 +79,9 @@ include __DIR__ . '/../../../includes/sidebar.php';
         <?php if ($success): ?>
             <div class="alert alert-success">
                 Dentist created successfully.
-                <a href="/admin/dentists/create" class="alert-link">Add another</a>
+                <a href="<?= PROJECT_BASE ?>admin/dentists/create" class="alert-link">Add another</a>
                 or
-                <a href="/admin/dentists" class="alert-link">go back to list</a>.
+                <a href="<?= PROJECT_BASE ?>admin/dentists" class="alert-link">go back to list</a>.
             </div>
         <?php endif; ?>
 
@@ -109,11 +107,6 @@ include __DIR__ . '/../../../includes/sidebar.php';
                         <div class="col-12">
                             <h5 class="fw-bold">Account Information</h5>
                             <hr>
-                        </div>
-
-                        <div class="col-md-6">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" name="name" class="form-control" required>
                         </div>
 
                         <div class="col-md-6">
@@ -180,5 +173,5 @@ include __DIR__ . '/../../../includes/sidebar.php';
         </div>
 
     </div>
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 </div>

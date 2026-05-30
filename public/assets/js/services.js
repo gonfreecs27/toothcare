@@ -23,7 +23,7 @@ $(document).ready(function () {
         const duration = $('#filterDuration').val();
         const sort = $('#sortServices').val();
 
-        $.get('/admin/services/list', {
+        $.get(App.endpoint('admin/services/list'), {
             page,
             limit: 12,
             search,
@@ -173,7 +173,7 @@ $(document).ready(function () {
 
     $('#btnSaveService').on('click', function () {
         $.ajax({
-            url: '/admin/services/save',
+            url: App.endpoint('admin/services/save'),
             type: 'POST',
             data: $form.serialize(),
             success() {
@@ -208,7 +208,7 @@ $(document).ready(function () {
             'Are you sure you want to delete this service?',
             function () {
                 $.ajax({
-                    url: `/admin/services/delete?id=${id}`,
+                    url: App.endpoint(`admin/services/delete?id=${id}`),
                     type: 'DELETE',
                     success() {
                         loadServices(currentPage);

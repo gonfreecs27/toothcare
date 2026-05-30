@@ -11,7 +11,7 @@ class Permission {
             return false;
         }
 
-        return in_array($_SESSION['user']['role'], $allowedRoles);
+        return in_array($_SESSION['user']['role'], $allowedRoles) || in_array('all', $allowedRoles);
     }
 
     public static function activeMenu(string $baseUrl, array $pages = []): string {

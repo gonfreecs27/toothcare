@@ -1,12 +1,11 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/Dentist.php');
+Core::loadModel("Dentist");
 
 $dentistClass = new Dentist();
 $dentists = $dentistClass->all();
@@ -15,8 +14,8 @@ $totalDentists = count($dentists);
 $activeDentists = count(array_filter($dentists, fn($d) => $d['status'] === 'active'));
 $inactiveDentists = $totalDentists - $activeDentists;
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -31,7 +30,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 <p class="text-muted mb-0">Manage clinic dentists and credentials</p>
             </div>
 
-            <a href="/admin/dentists/create" class="btn btn-primary">
+            <a href="<?= PROJECT_BASE ?>admin/dentists/create" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Add Dentist
             </a>
 
@@ -158,7 +157,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                                     <td>
                                         <div class="d-flex gap-2">
 
-                                            <a href="/admin/dentists/edit?id=<?= $row['id'] ?>"
+                                            <a href="<?= PROJECT_BASE ?>admin/dentists/edit?id=<?= $row['id'] ?>"
                                                 class="btn btn-warning btn-sm">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
@@ -188,14 +187,13 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
     </div>
 
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 
 </div>
 
 <!-- JS -->
 <script>
     $(document).ready(function() {
-
         $('#dentistsTable').DataTable({
             responsive: true,
             pageLength: 10,
@@ -212,11 +210,9 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 'Delete Dentist',
                 'Are you sure you want to delete <b>' + name + '</b>?',
                 function() {
-                    window.location.href = '/admin/dentists/delete?id=' + id;
+                    window.location.href = '<?= PROJECT_BASE ?>admin/dentists/delete?id=' + id;
                 },
-                function() {
-                    alertify.error('Cancelled');
-                }
+                function() { }
             ).set('labels', {
                 ok: 'Delete',
                 cancel: 'Cancel'

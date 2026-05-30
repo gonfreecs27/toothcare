@@ -1,23 +1,20 @@
 <?php
-session_start();
+require '../../../init.php';
 
-$additional_js = [
-    '/assets/js/services.js'
-];
+if (!Permission::hasAccess(['all'])) {
+    Core::redirect("login");
+}
 
-$additional_css = [
-    '/assets/css/services.css'
-];
-
-require_once(__DIR__ . '/../../../includes/header_app.php');
-require_once(__DIR__ . '/../../../includes/sidebar.php');
+Component::header(false, null, [
+    PROJECT_BASE . 'assets/js/services.js'
+], [
+    PROJECT_BASE . 'assets/css/services.css'
+]);
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
-
     <div class="content">
-
-        <!-- PAGE HEADER -->
         <div class="d-flex justify-content-between align-items-center mb-3">
 
             <div>
@@ -173,4 +170,4 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
     </div>
 </div>
 
-<?php require_once(__DIR__ . '/../../../includes/footer_app.php'); ?>
+<?php Component::footer(); ?>
