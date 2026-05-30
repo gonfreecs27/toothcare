@@ -1,13 +1,10 @@
-<?php
-$user = $_SESSION['user'] ?? null;
-?>
-
 <!DOCTYPE html>
 <html>
-<head>
-    <title>ToothCare System</title>
 
-    <link rel="icon" href="/assets/images/icon.png">
+<head>
+    <title><?= BRAND_NAME ?></title>
+
+    <link rel="icon" href="<?= PROJECT_BASE ?>assets/images/icon.png">
 
     <!-- JQUERY -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -16,7 +13,7 @@ $user = $_SESSION['user'] ?? null;
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <!-- DATATABLES -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap5.min.css">
     <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
@@ -34,9 +31,9 @@ $user = $_SESSION['user'] ?? null;
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/selectize/dist/css/selectize.default.css">
     <script src="https://cdn.jsdelivr.net/npm/selectize/dist/js/standalone/selectize.min.js"></script>
 
-    <link rel="stylesheet" href="/assets/css/layout.css">
-    <link rel="stylesheet" href="/assets/css/dashboard.css">
-    
+    <link rel="stylesheet" href="<?= PROJECT_BASE ?>assets/css/layout.css">
+    <link rel="stylesheet" href="<?= PROJECT_BASE ?>assets/css/dashboard.css">
+
     <?php
     if (isset($additional_css)) {
         foreach ($additional_css as $css) {
@@ -52,4 +49,5 @@ $user = $_SESSION['user'] ?? null;
 
     ?>
 </head>
+
 <body>

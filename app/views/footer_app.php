@@ -1,5 +1,5 @@
 <div class="footer text-center">
-    © <?= date('Y') ?> ToothCare Dental Clinic System
+    © <?= date('Y') ?> <?= BRAND_NAME ?>: Dental Clinic System
 </div>
 
 </div>

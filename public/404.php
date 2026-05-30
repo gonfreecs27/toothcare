@@ -1,6 +1,6 @@
 <?php
-$title = "404 - Page Not Found | ToothCare";
-include "../includes/header_public.php";
+require_once(__DIR__ . '/../init.php');
+Component::header(true, "404 - Page Not Found | "  . BRAND_NAME);
 ?>
 
 <!-- 404 CONTENT -->
@@ -18,7 +18,7 @@ include "../includes/header_public.php";
             The page you're looking for doesn't exist or may have been moved.
         </p>
 
-        <a href="/" class="btn btn-primary btn-lg mt-3">
+        <a href="<?= PROJECT_BASE ?>" class="btn btn-primary btn-lg mt-3">
             <i class="bi bi-house"></i> Back to Home
         </a>
 
@@ -26,4 +26,4 @@ include "../includes/header_public.php";
 
 </section>
 
-<?php include "../includes/footer_public.php"; ?>
+<?php Component::footer(true) ?>

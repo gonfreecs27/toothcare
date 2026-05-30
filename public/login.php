@@ -1,14 +1,12 @@
 <?php
-session_start();
+require '../init.php';
 
-require_once __DIR__ . '/../models/User.php';
-
+Core::loadModel("User");
 $userModel = new User();
 $error = "";
 
 if (isset($_SESSION['user'])) {
-    header("Location: /loading");
-    exit;
+    Core::redirect("loading");
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -30,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 'role' => $user['role']
             ];
 
-            header("Location: /loading");
+            Core::redirect("loading");
             exit;
         } else {
             $error = "Invalid email or password.";
@@ -43,18 +41,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <html>
 
 <head>
-    <title>Login | ToothCare Dental Clinic System</title>
-    <link rel="icon" href="/assets/images/icon.png" type="image/x-icon">
+    <title>Login | <?= BRAND_NAME ?>: Dental Clinic System</title>
+    <link rel="icon" href="<?= PROJECT_BASE ?>assets/images/icon.png" type="image/x-icon">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="/assets/css/login.css">
+    <link rel="stylesheet" href="<?= PROJECT_BASE ?>assets/css/login.css">
 </head>
 
 <body>
     <div class="login-box">
 
-        <div class="brand">Tooth<span>Care</span></div>
+        <div class="brand"><?= BRAND_NAME_FIRST ?><span><?= BRAND_NAME_SECOND ?></span></div>
         <div class="subtitle">Dental Clinic Management System</div>
 
         <?php if ($error): ?>
@@ -80,12 +78,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
 
         <div class="links">
-            <a href="/register">Create Account</a>
-            <a href="/"><i class="bi bi-arrow-left"></i> Back to Home</a>
+            <a href="<?= PROJECT_BASE ?>register">Create Account</a>
+            <a href="<?= PROJECT_BASE ?>"><i class="bi bi-arrow-left"></i> Back to Home</a>
         </div>
 
         <div class="footer">
-            © <?= date('Y') ?> ToothCare Dental Clinic System
+            © <?= date('Y') ?> <?= BRAND_NAME ?>: Dental Clinic System
         </div>
 
     </div>

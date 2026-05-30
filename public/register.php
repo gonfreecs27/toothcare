@@ -1,18 +1,15 @@
 <?php
-session_start();
+require '../init.php';
 
-require_once '../models/User.php';
-require_once '../includes/components.php';
+if (isset($_SESSION['user'])) {
+    Core::redirect("loading");
+}
 
+Core::loadModel("User");
 $userModel = new User();
 
 $error = "";
 $success = "";
-
-if (isset($_SESSION['user'])) {
-    header("Location: /loading");
-    exit;
-}
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $name = trim($_POST['name'] ?? '');
@@ -39,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-include '../includes/header_public.php';
+Component::header(true);
 
 ?>
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
@@ -47,24 +44,24 @@ include '../includes/header_public.php';
     <div class="card shadow-lg p-4" style="width: 420px; border-radius: 14px;">
 
         <div class="text-center mb-3">
-            <h3 class="fw-bold text-primary">Tooth<span class="text-info">Care</span></h3>
+            <h3 class="fw-bold text-primary"><?= BRAND_NAME_FIRST ?><span class="text-info"><?= BRAND_NAME_SECOND ?></span></h3>
             <small class="text-muted">Create Staff Account</small>
         </div>
 
         <?php if ($error): ?>
-            <?= alert('danger', $error) ?>
+            <?= Component::alert('danger', $error) ?>
         <?php endif; ?>
 
         <?php if ($success): ?>
-            <?= alert('success', $success) ?>
+            <?= Component::alert('success', $success) ?>
         <?php endif; ?>
 
         <form method="POST">
 
-            <?= inputIcon('person', 'text', 'name', 'Full Name') ?>
-            <?= inputIcon('envelope', 'email', 'email', 'Email Address') ?>
-            <?= inputIcon('lock', 'password', 'password', 'Password') ?>
-            <?= inputIcon('shield-lock', 'password', 'confirm_password', 'Confirm Password') ?>
+            <?= Component::inputIcon('person', 'text', 'name', 'Full Name') ?>
+            <?= Component::inputIcon('envelope', 'email', 'email', 'Email Address') ?>
+            <?= Component::inputIcon('lock', 'password', 'password', 'Password') ?>
+            <?= Component::inputIcon('shield-lock', 'password', 'confirm_password', 'Confirm Password') ?>
 
             <button class="btn btn-primary w-100 mt-2">
                 <i class="bi bi-person-plus"></i> Create Account
@@ -74,10 +71,10 @@ include '../includes/header_public.php';
 
         <div class="text-center mt-3 small">
             Already have an account?
-            <a href="/login">Login</a>
+            <a href="<?= PROJECT_BASE ?>login">Login</a>
         </div>
     </div>
 
 </div>
 
-<?php include '../includes/footer_public.php'; ?>
+<?php Component::footer(true) ?>

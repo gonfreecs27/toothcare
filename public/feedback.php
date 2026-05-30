@@ -1,6 +1,6 @@
 <?php
-require_once(__DIR__ . '/../includes/header_public.php');
-require_once(__DIR__ . '/../includes/components.php');
+require_once(__DIR__ . '/../init.php');
+Component::header(true);
 ?>
 
 <!-- HERO -->
@@ -40,8 +40,7 @@ require_once(__DIR__ . '/../includes/components.php');
                         Share Your Experience
                     </h4>
 
-                    <form method="POST" action="/feedback/submit">
-
+                    <form method="POST">
                         <!-- Name -->
                         <div class="mb-3">
                             <label class="form-label">Your Name</label>
@@ -114,7 +113,7 @@ require_once(__DIR__ . '/../includes/components.php');
 
             <div class="col-md-4">
                 <div class="feature-orange">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-graph-up",
                         "Service Improvement",
                         "Helps us improve our dental services and patient care."
@@ -125,7 +124,7 @@ require_once(__DIR__ . '/../includes/components.php');
 
             <div class="col-md-4">
                 <div class="feature-green">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-people",
                         "Patient Experience",
                         "Ensures a better experience for all our patients."
@@ -135,7 +134,7 @@ require_once(__DIR__ . '/../includes/components.php');
 
             <div class="col-md-4">
                 <div class="feature-blue">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-heart-pulse",
                         "Community Impact",
                         "Contributes to the overall health and well-being of our community."
@@ -148,4 +147,4 @@ require_once(__DIR__ . '/../includes/components.php');
 
 </section>
 
-<?php require_once(__DIR__ . '/../includes/footer_public.php'); ?>
+<?php Component::footer(true) ?>

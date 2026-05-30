@@ -1,9 +1,9 @@
 <?php
+require '../init.php';
 session_start();
 
 if (!isset($_SESSION['user'])) {
-    header("Location: /login");
-    exit;
+    Core::redirect("login");
 }
 
 $role = $_SESSION['user']['role'];
@@ -21,7 +21,7 @@ $redirect = $routes[$role] ?? '/staff/dashboard';
 <html>
 
 <head>
-    <title>Loading ToothCare...</title>
+    <title>Loading <?= BRAND_NAME ?>...</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -82,7 +82,7 @@ $redirect = $routes[$role] ?? '/staff/dashboard';
 
     <div class="loader-box">
 
-        <div class="brand">Tooth<span>Care</span></div>
+        <div class="brand"><?= BRAND_NAME_FIRST ?><span><?= BRAND_NAME_SECOND ?></span></div>
 
         <div class="spinner"></div>
 

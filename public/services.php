@@ -1,7 +1,8 @@
 <?php
-require_once(__DIR__ . '/../includes/header_public.php');
-require_once(__DIR__ . '/../includes/components.php');
-require_once(__DIR__ . '/../models/Service.php');
+require_once(__DIR__ . '/../init.php');
+
+Component::header(true);
+Core::loadModel("Service");
 
 $serviceModel = new Service();
 $services = $serviceModel->all();
@@ -11,7 +12,6 @@ $services = $serviceModel->all();
 <section class="services-hero">
 
     <div class="container text-center">
-
         <div class="services-badge">
             <i class="bi bi-heart-pulse-fill"></i>
             Professional Dental Care
@@ -25,7 +25,6 @@ $services = $serviceModel->all();
             Comprehensive dental treatments designed to keep your smile
             healthy, beautiful, and confident.
         </p>
-
     </div>
 
 </section>
@@ -58,7 +57,7 @@ $services = $serviceModel->all();
                         </div>
 
                         <div class="d-grid mt-3">
-                            <a href="/appointment"
+                            <a href="<?= PROJECT_BASE ?>appointment"
                                 class="btn btn-primary">
                                 <i class="bi bi-calendar-check"></i>
                                 Book Appointment
@@ -85,7 +84,7 @@ $services = $serviceModel->all();
         <div class="text-center mb-5">
 
             <h2 class="fw-bold">
-                Why Choose ToothCare?
+                Why Choose <?= BRAND_NAME ?>?
             </h2>
 
             <p class="text-muted">
@@ -98,7 +97,7 @@ $services = $serviceModel->all();
 
             <div class="col-md-4">
                 <div class="feature-orange">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-award",
                         "Experienced Dentists",
                         "Skilled professionals dedicated to quality treatment."
@@ -108,7 +107,7 @@ $services = $serviceModel->all();
 
             <div class="col-md-4">
                 <div class="feature-green">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-building",
                         "Modern Facility",
                         "State-of-the-art equipment for advanced dental care."
@@ -118,7 +117,7 @@ $services = $serviceModel->all();
 
             <div class="col-md-4">
                 <div class="feature-blue">
-                    <?php featureCard(
+                    <?php Component::featureCard(
                         "bi-emoji-smile",
                         "Patient Comfort",
                         "Friendly environment focused on your comfort and care."
@@ -145,7 +144,7 @@ $services = $serviceModel->all();
             Book an appointment today and let us help you achieve a healthier smile.
         </p>
 
-        <a href="/appointment" class="btn btn-primary btn-lg px-5">
+        <a href="<?= PROJECT_BASE ?>appointment" class="btn btn-primary btn-lg px-5">
             <i class="bi bi-calendar-check"></i>
             Book Appointment
         </a>
@@ -154,4 +153,4 @@ $services = $serviceModel->all();
 
 </section>
 
-<?php require_once(__DIR__ . '/../includes/footer_public.php'); ?>
+<?php Component::footer(true) ?>

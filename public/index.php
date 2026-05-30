@@ -1,14 +1,11 @@
 <?php
-session_start();
-
-$title = "ToothCare: Dental Clinic System";
-include "../includes/header_public.php";
-include "../includes/components.php";
+require '../init.php';
 
 if (isset($_SESSION['user'])) {
-    header("Location: /loading");
-    exit;
+    Core::redirect("loading");
 }
+
+Component::header(true);
 ?>
 
 <!-- HERO -->
@@ -24,7 +21,7 @@ if (isset($_SESSION['user'])) {
                 </div>
 
                 <h1 class="fw-bold display-3">
-                    Tooth<span class="text-primary">Care</span>
+                    <?= BRAND_NAME_FIRST ?><span class="text-primary"><?= BRAND_NAME_SECOND ?></span>
                 </h1>
 
                 <p class="fs-4 text-muted mt-3">
@@ -56,12 +53,12 @@ if (isset($_SESSION['user'])) {
                 </div>
 
                 <div class="mt-4">
-                    <a href="/login" class="btn btn-primary btn-lg px-4 me-2">
+                    <a href="<?= PROJECT_BASE ?>login" class="btn btn-primary btn-lg px-4 me-2">
                         <i class="bi bi-box-arrow-in-right"></i>
                         Get Started
                     </a>
 
-                    <a href="/appointment" class="btn btn-outline-primary btn-lg px-4">
+                    <a href="<?= PROJECT_BASE ?>appointment" class="btn btn-outline-primary btn-lg px-4">
                         <i class="bi bi-calendar-check"></i>
                         Book Appointment
                     </a>
@@ -71,7 +68,7 @@ if (isset($_SESSION['user'])) {
 
             <div class="col-lg-6 text-center position-relative">
 
-                <img src="/assets/images/bg.png"
+                <img src="<?= PROJECT_BASE ?>assets/images/bg.png"
                     class="hero-img img-fluid">
 
                 <div class="hero-floating-card card-1">
@@ -136,7 +133,7 @@ if (isset($_SESSION['user'])) {
 
         <div class="col-md-4">
             <div class="feature-blue">
-                <?php featureCard(
+                <?php Component::featureCard(
                     "bi-calendar-check",
                     "Appointments",
                     "Manage patient schedules easily and efficiently."
@@ -146,7 +143,7 @@ if (isset($_SESSION['user'])) {
 
         <div class="col-md-4">
             <div class="feature-green">
-                <?php featureCard(
+                <?php Component::featureCard(
                     "bi-people",
                     "Patient Records",
                     "Secure and organized dental history management."
@@ -156,7 +153,7 @@ if (isset($_SESSION['user'])) {
 
         <div class="col-md-4">
             <div class="feature-orange">
-                <?php featureCard(
+                <?php Component::featureCard(
                     "bi-star",
                     "Feedback System",
                     "Collect feedbacks to improve service quality."
@@ -181,12 +178,12 @@ if (isset($_SESSION['user'])) {
             Book your appointment online and receive quality dental care.
         </p>
 
-        <a href="/appointment" class="btn btn-primary btn-lg px-5">
+        <a href="<?= PROJECT_BASE ?>appointment" class="btn btn-primary btn-lg px-5">
             <i class="bi bi-calendar-check"></i>
             Book Appointment
         </a>
 
-        <a href="/feedback" class="btn btn-warning btn-lg px-5">
+        <a href="<?= PROJECT_BASE ?>feedback" class="btn btn-warning btn-lg px-5">
             <i class="bi bi-chat-dots"></i>
             Send Feedback
         </a>
@@ -202,11 +199,11 @@ if (isset($_SESSION['user'])) {
 
             <h2 class="fw-bold">
                 <i class="bi bi-heart-pulse-fill text-danger"></i>
-                About ToothCare
+                About <?= BRAND_NAME ?>
             </h2>
 
             <p class="text-muted mt-3">
-                ToothCare is a modern dental clinic management system designed
+                <?= BRAND_NAME ?> is a modern dental clinic management system designed
                 to improve workflow efficiency, enhance patient experiences,
                 and simplify clinic operations.
             </p>
@@ -222,19 +219,19 @@ if (isset($_SESSION['user'])) {
             <div class="row g-3">
 
                 <div class="col-6">
-                    <?php statBox("500+", "Patients"); ?>
+                    <?php Component::statBox("500+", "Patients"); ?>
                 </div>
 
                 <div class="col-6">
-                    <?php statBox("10+", "Services"); ?>
+                    <?php Component::statBox("10+", "Services"); ?>
                 </div>
 
                 <div class="col-6">
-                    <?php statBox("5", "Dentists"); ?>
+                    <?php Component::statBox("5", "Dentists"); ?>
                 </div>
 
                 <div class="col-6">
-                    <?php statBox("24/7", "System Access"); ?>
+                    <?php Component::statBox("24/7", "System Access"); ?>
                 </div>
 
             </div>
@@ -244,4 +241,4 @@ if (isset($_SESSION['user'])) {
 
 </section>
 
-<?php include "../includes/footer_public.php"; ?>
+<?php Component::footer(true); ?>
