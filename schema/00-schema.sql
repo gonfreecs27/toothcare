@@ -1,1 +1,1 @@
-CREATE SCHEMA toothcare;
+CREATE DATABASE toothcare;
