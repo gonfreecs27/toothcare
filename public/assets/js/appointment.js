@@ -1,6 +1,7 @@
 $(document).ready(function () {
 
     let selectedEventId = null;
+    let serviceSelect = null;
 
     const $modal = $('#addAppointmentModal');
     const $form = $('#appointmentForm');
@@ -12,6 +13,11 @@ $(document).ready(function () {
         selectedEventId = null;
 
         $form[0].reset();
+
+        if (serviceSelect) {
+            serviceSelect.clear();
+        }
+        $('#servicesTotal').val('0.00');
 
         $('#btnSaveAppointment')
             .text('Save Appointment')
@@ -63,7 +69,6 @@ $(document).ready(function () {
     }
 
     function formatTime(date) {
-
         return date.toTimeString().slice(0, 5);
     }
 
@@ -165,7 +170,10 @@ $(document).ready(function () {
         const startTime = $('input[name="start_time"]').val();
         const endTime = $('input[name="end_time"]').val();
 
-        if (startTime >= endTime) {
+        const start = new Date(`1970-01-01T${startTime}:00`);
+        const end = new Date(`1970-01-01T${endTime}:00`);
+
+        if (start >= end) {
             alertify.error('End time must be greater than start time');
             return;
         }
@@ -173,14 +181,12 @@ $(document).ready(function () {
         btn.prop('disabled', true);
 
         $.ajax({
-
             url: selectedEventId
                 ? `/admin/appointments/update/${selectedEventId}`
                 : '/admin/appointments/create',
 
             type: 'POST',
-
-            data: $form.serialize(),
+            data: $.param($form.serializeArray()),
 
             success(res) {
 
@@ -211,7 +217,7 @@ $(document).ready(function () {
         });
     });
 
-    window.openAppointmentModal = function (event) {
+    function openAppointmentModal(event) {
 
         resetForm();
 
@@ -258,7 +264,7 @@ $(document).ready(function () {
             type: 'POST',
 
             data: {
-                appointment_date: event.startStr.split('T')[0],
+                appointment_date: event.start.toISOString().split('T')[0],
                 start_time: formatTime(event.start),
                 end_time: formatTime(event.end)
             },
@@ -279,6 +285,91 @@ $(document).ready(function () {
         });
     }
 
+    function loadServices() {
+        $.get('/admin/services/list', function (response) {
+            const $select = $('#services');
+
+            if ($select[0].selectize) {
+                $select[0].selectize.destroy();
+            }
+
+            $select.empty();
+            serviceSelect = $select.selectize({
+                plugins: ['remove_button'],
+                valueField: 'id',
+                labelField: 'name',
+                searchField: ['name'],
+                placeholder: 'Select services',
+                maxItems: null,
+                create: false,
+                options: response.data,
+                render: {
+                    option: function (item, escape) {
+                        return `
+                            <div class="px-2 py-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="flex-grow-1 pe-2">
+                                        <div class="fw-semibold text-dark">
+                                            ${escape(item.name)}
+                                        </div>
+
+                                        ${item.description
+                                ? `
+                                                <small class="text-muted d-block text-truncate">
+                                                    ${escape(item.description)}
+                                                </small>
+                                            `
+                                : ''
+                            }
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge bg-primary-subtle text-primary fw-semibold">
+                                            ₱${parseFloat(item.price || 0).toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    },
+
+                    item: function (item, escape) {
+
+                        return `
+                            <div class="d-inline-flex align-items-center">
+
+                                <span class="fw-medium">
+                                    ${escape(item.name)}
+                                </span>
+
+                                <span class="ms-2 badge rounded-pill bg-light text-dark border">
+                                    ₱${parseFloat(item.price || 0).toLocaleString()}
+                                </span>
+
+                            </div>
+                        `;
+                    }
+                },
+                onChange: function updateServicesTotal() {
+                    let total = 0;
+                    const values = serviceSelect.getValue();
+                    values.forEach(id => {
+                        const service = serviceSelect.options[id];
+                        if (service) {
+                            total += parseFloat(service.price || 0);
+                        }
+                    });
+
+                    $('#servicesTotal').val(
+                        total.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })
+                    );
+                }
+            })[0].selectize;
+        });
+    }
+
     populateSelect(
         '/admin/patients/list',
         'select[name="patient_id"]',
@@ -290,4 +381,6 @@ $(document).ready(function () {
         'select[name="dentist_id"]',
         'Select Dentist'
     );
+
+    loadServices();
 });

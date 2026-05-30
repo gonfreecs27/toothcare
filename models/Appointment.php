@@ -1,6 +1,7 @@
 <?php
 
 require_once "BaseModel.php";
+require_once "AppointmentService.php";
 
 class Appointment extends BaseModel {
     protected $table = "appointments";
@@ -45,8 +46,63 @@ class Appointment extends BaseModel {
         return $this->fetchAll($sql, $params);
     }
 
+    public function getAppointments($start = null, $end = null) {
+        $params = [];
+        $where = "";
+        
+        if ($start && $end) {
+            $start = date('Y-m-d H:i:s', strtotime($start));
+            $end = date('Y-m-d H:i:s', strtotime($end));
+
+            $where = "
+                WHERE a.appointment_start < ?
+                AND a.appointment_end > ?
+            ";
+
+            $params[] = $end;
+            $params[] = $start;
+        }
+
+        $sql = "
+            SELECT 
+                a.*,
+                CONCAT(p.firstname, ' ', p.lastname) AS patient_name,
+                CONCAT(d.firstname, ' ', d.lastname) AS dentist_name
+            FROM appointments a
+            JOIN patients p ON p.id = a.patient_id
+            JOIN dentists d ON d.id = a.dentist_id
+            $where
+            ORDER BY a.appointment_start DESC
+        ";
+
+        $appointments = $this->fetchAll($sql, $params);
+        $events = [];
+
+        foreach ($appointments as $row) {
+            $services = $this->fetchAll("
+                SELECT s.id, s.name, s.price
+                FROM appointment_services aps
+                JOIN services s ON s.id = aps.service_id
+                WHERE aps.appointment_id = ?
+            ", [$row['id']]);
+
+            $row['services'] = $services;
+
+            $events[] = [
+                'id' => $row['id'],
+                'title' => $row['patient_name'],
+                'start' => $row['appointment_start'],
+                'end' => $row['appointment_end'],
+
+                'extendedProps' => $row
+            ];
+        }
+
+        return $events;
+    }
+
     public function create($data) {
-        return $this->execute("
+        $this->execute("
             INSERT INTO appointments
                 (patient_id, dentist_id, appointment_start, appointment_end, status, reason)
             VALUES (?, ?, ?, ?, ?, ?)
@@ -58,6 +114,13 @@ class Appointment extends BaseModel {
             $data['status'] ?? 'pending',
             $data['reason'] ?? null
         ]);
+
+        $appointmentId = $this->db()->lastInsertId();
+
+        $appointmentService = new AppointmentService();
+        $appointmentService->sync($appointmentId, $data['services'] ?? []);
+
+        return $appointmentId;
     }
 
     public function update($id, $data) {

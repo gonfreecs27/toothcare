@@ -21,6 +21,11 @@ try {
     $status = trim($_POST['status'] ?? 'pending');
     $reason = trim($_POST['reason'] ?? '');
 
+    $services = $_POST['services'] ?? [];
+
+    // convert to integers & remove invalid values
+    $services = array_values(array_filter(array_map('intval', $services)));
+
     if (!$patient_id) {
         throw new Exception('Patient is required');
     }
@@ -72,7 +77,8 @@ try {
         'appointment_start' => $start,
         'appointment_end' => $end,
         'status' => $status,
-        'reason' => $reason
+        'reason' => $reason,
+        'services' => $services
     ]);
 
     if (!$created) {

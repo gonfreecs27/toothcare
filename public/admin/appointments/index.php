@@ -103,6 +103,9 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <div id="calendar"></div>
+                <div id="calendarLoader" class="d-none text-center">
+                    Loading...
+                </div>
             </div>
         </div>
 
@@ -163,7 +166,22 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
 
                     <div class="mb-2">
                         <label class="form-label">Services</label>
-                        <div id="serviceList" class="border rounded p-2" style="max-height:140px;overflow:auto;"></div>
+                        <select id="services" name="services[]" multiple placeholder="Select services..."></select>
+                    </div>
+
+                    <div class="mb-2">
+                        <label class="form-label">Total</label>
+
+                        <div class="input-group">
+                            <span class="input-group-text">Php</span>
+
+                            <input
+                                type="text"
+                                id="servicesTotal"
+                                class="form-control"
+                                value="0.00"
+                                readonly>
+                        </div>
                     </div>
 
                     <div class="mb-2">
