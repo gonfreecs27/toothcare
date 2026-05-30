@@ -25,15 +25,6 @@ $(document).ready(function () {
             .addClass('btn-primary');
     }
 
-    function showLoader(show = true) {
-
-        if (show) {
-            $('#calendarLoader').removeClass('d-none');
-        } else {
-            $('#calendarLoader').addClass('d-none');
-        }
-    }
-
     function getStatusClass(status) {
 
         const classes = {
@@ -77,7 +68,7 @@ $(document).ready(function () {
 
         height: 'auto',
 
-        selectable: true,
+        selectable: false,
         editable: true,
         nowIndicator: true,
 
@@ -96,41 +87,31 @@ $(document).ready(function () {
             meridiem: true
         },
 
-        events: {
-            url: '/admin/appointments/list',
-            method: 'GET',
-            failure() {
-                alertify.error('Failed to load appointments');
-            }
-        },
-
-        loading(isLoading) {
-            showLoader(isLoading);
+        events: function(fetchInfo, successCallback, failureCallback) {
+            $.ajax({
+                url: App.endpoint('admin/appointments/list'),
+                method: 'POST',
+                data: {
+                    start: fetchInfo.startStr,
+                    end: fetchInfo.endStr
+                },
+                success: function(response) {
+                    successCallback(response.events);
+                    $.each(response.tally, (a, b) => {
+                        $(`h3#${a}`).html(b);
+                    });
+                },
+                error: function() {
+                    failureCallback();
+                    alertify.error('Failed to load appointments');
+                }
+            });
         },
 
         dateClick(info) {
             resetForm();
 
             $('input[name="appointment_date"]').val(info.dateStr);
-
-            $modal.modal('show');
-        },
-
-        select(info) {
-
-            resetForm();
-
-            const start = new Date(info.start);
-            const end = new Date(info.end);
-
-            $('input[name="appointment_date"]')
-                .val(info.startStr.split('T')[0]);
-
-            $('input[name="start_time"]')
-                .val(formatTime(start));
-
-            $('input[name="end_time"]')
-                .val(formatTime(end));
 
             $modal.modal('show');
         },
@@ -179,28 +160,27 @@ $(document).ready(function () {
         }
 
         btn.prop('disabled', true);
+        let formData = $form.serializeArray();
+        if (selectedEventId) {
+            formData.push({
+                name: 'id',
+                value: selectedEventId
+            });
+        }
 
         $.ajax({
             url: selectedEventId
-                ? `/admin/appointments/update/${selectedEventId}`
-                : '/admin/appointments/create',
+                ? App.endpoint(`admin/appointments/update`)
+                : App.endpoint('admin/appointments/create'),
 
             type: 'POST',
-            data: $.param($form.serializeArray()),
+            data: $.param(formData),
 
             success(res) {
-
                 $modal.modal('hide');
-
                 resetForm();
-
                 calendar.refetchEvents();
-
-                alertify.success(
-                    selectedEventId
-                        ? 'Appointment updated'
-                        : 'Appointment created'
-                );
+                alertify.success(res.message);
             },
 
             error(xhr) {
@@ -218,7 +198,6 @@ $(document).ready(function () {
     });
 
     function openAppointmentModal(event) {
-
         resetForm();
 
         selectedEventId = event.id;
@@ -231,6 +210,11 @@ $(document).ready(function () {
 
         $('select[name="dentist_id"]')
             .val(event.extendedProps.dentist_id);
+
+        if (serviceSelect) {
+            const serviceIds = (event.extendedProps.services || []).map(s => s.id);
+            serviceSelect.setValue(serviceIds);
+        }
 
         $('input[name="appointment_date"]')
             .val(start.toISOString().split('T')[0]);
@@ -256,27 +240,19 @@ $(document).ready(function () {
     };
 
     function updateAppointmentSchedule(event, revertCallback) {
-
         $.ajax({
-
-            url: `/admin/appointments/update-schedule/${event.id}`,
-
+            url: App.endpoint('admin/appointments/update_schedule'),
             type: 'POST',
-
             data: {
-                appointment_date: event.start.toISOString().split('T')[0],
-                start_time: formatTime(event.start),
-                end_time: formatTime(event.end)
+                id: event.id,
+                start: event.start.toISOString(),
+                end: event.end.toISOString(),
             },
-
-            success() {
-                alertify.success('Appointment updated');
+            success(response) {
+                alertify.success(response.message);
             },
-
             error(xhr) {
-
                 revertCallback();
-
                 alertify.error(
                     xhr.responseJSON?.error ||
                     'Failed to update appointment'
@@ -286,7 +262,7 @@ $(document).ready(function () {
     }
 
     function loadServices() {
-        $.get('/admin/services/list', function (response) {
+        $.get(App.endpoint('admin/services/list'), function (response) {
             const $select = $('#services');
 
             if ($select[0].selectize) {
@@ -371,13 +347,13 @@ $(document).ready(function () {
     }
 
     populateSelect(
-        '/admin/patients/list',
+        App.endpoint('admin/patients/list'),
         'select[name="patient_id"]',
         'Select Patient'
     );
 
     populateSelect(
-        '/admin/dentists/list',
+        App.endpoint('admin/dentists/list'),
         'select[name="dentist_id"]',
         'Select Dentist'
     );

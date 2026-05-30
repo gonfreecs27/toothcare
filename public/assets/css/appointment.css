@@ -114,6 +114,7 @@
 
 .event-confirmed {
     background: #22c55e !important;
+    color: #fff;
 }
 
 .event-completed {

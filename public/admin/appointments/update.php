@@ -12,6 +12,9 @@ Core::loadModel("Appointment");
 $appointmentClass = new Appointment();
 
 try {
+
+    $id = (int) ($_POST['id'] ?? 0);
+
     $patient_id = trim($_POST['patient_id'] ?? '');
     $dentist_id = trim($_POST['dentist_id'] ?? '');
     $date = trim($_POST['appointment_date'] ?? '');
@@ -24,6 +27,10 @@ try {
 
     // convert to integers & remove invalid values
     $services = array_values(array_filter(array_map('intval', $services)));
+
+    if (!$id) {
+        throw new Exception('Appointment ID is required');
+    }
 
     if (!$patient_id) {
         throw new Exception('Patient is required');
@@ -63,17 +70,18 @@ try {
     $start = $startDateTime->format('Y-m-d H:i:s');
     $end   = $endDateTime->format('Y-m-d H:i:s');
 
-    $existing = $appointmentClass->findConflict(
+    $conflict = $appointmentClass->findConflict(
         $dentist_id,
         $start,
-        $end
+        $end,
+        $id
     );
 
-    if ($existing) {
+    if ($conflict) {
         throw new Exception('Dentist already has an appointment at this time');
     }
 
-    $created = $appointmentClass->create([
+    $updated = $appointmentClass->update($id, [
         'patient_id' => $patient_id,
         'dentist_id' => $dentist_id,
         'appointment_start' => $start,
@@ -83,17 +91,17 @@ try {
         'services' => $services
     ]);
 
-    if (!$created) {
-        throw new Exception('Failed to save appointment');
+    if (!$updated) {
+        throw new Exception('Failed to update appointment');
     }
 
     echo json_encode([
         'success' => true,
-        'message' => 'Appointment created successfully'
+        'message' => 'Appointment updated successfully'
     ]);
 } catch (Exception $e) {
     http_response_code(422);
     echo json_encode([
-        'error' => $e->getMessage(),
+        'error' => $e->getMessage()
     ]);
 }

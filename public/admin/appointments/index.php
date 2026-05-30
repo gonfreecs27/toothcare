@@ -1,16 +1,16 @@
 <?php
-session_start();
+require '../../../init.php';
 
-$additional_js = [
-    '/assets/js/appointment.js'
-];
+if (!Permission::hasAccess(['all'])) {
+    Core::redirect("login");
+}
 
-$additional_css = [
-    '/assets/css/appointment.css'
-];
-
-require_once(__DIR__ . '/../../../includes/header_app.php');
-require_once(__DIR__ . '/../../../includes/sidebar.php');
+Component::header(false, null, [
+    PROJECT_BASE . 'assets/js/appointment.js'
+], [
+    PROJECT_BASE . 'assets/css/appointment.css'
+]);
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -55,17 +55,6 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
                         </div>
                     </div>
                 </div>
-
-                <div class="d-flex gap-2">
-                    <select id="filterStatus" class="form-select form-select-sm">
-                        <option value="">All Status</option>
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="completed">Completed</option>
-                        <option value="cancelled">Cancelled</option>
-                    </select>
-                </div>
-
             </div>
         </div>
 
@@ -103,15 +92,12 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <div id="calendar"></div>
-                <div id="calendarLoader" class="d-none text-center">
-                    Loading...
-                </div>
             </div>
         </div>
 
     </div>
 
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 </div>
 
 <div class="modal fade" id="appointmentModal" tabindex="-1">
@@ -142,7 +128,7 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
 
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
-                    <i class="bi bi-calendar-plus me-2"></i>New Appointment
+                    <i class="bi bi-calendar-plus me-2"></i>Manage Appointment
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>

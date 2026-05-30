@@ -1,25 +1,33 @@
 <?php
-session_start();
+require '../../../init.php';
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+if (!Permission::hasAccess(['all'])) {
     http_response_code(401);
     echo json_encode(['error' => 'Unauthorized']);
     exit;
 }
 
-require_once(__DIR__ . '/../../../models/Appointment.php');
-
+Core::loadModel("Appointment");
 $appointmentClass = new Appointment();
 
 try {
-    $start = $_GET['start'] ?? null;
-    $end   = $_GET['end'] ?? null;
+    $start = $_POST['start'] ?? null;
+    $end   = $_POST['end'] ?? null;
 
     $appointments = $appointmentClass->getAppointments($start, $end);
-    echo json_encode($appointments);
-} catch (Exception $e) {
+    $tally = ["totalAppointments" => count($appointments)];
 
+    foreach ($appointments as $a) {
+        $key = strtolower($a['extendedProps']['status']) . 'Appointments';
+        $tally[$key] = ($tally[$key] ?? 0) + 1;
+    }
+
+    echo json_encode([
+        "events" => $appointments,
+        "tally" => $tally
+    ]);
+} catch (Exception $e) {
     http_response_code(500);
     echo json_encode([
         'error' => $e->getMessage()
