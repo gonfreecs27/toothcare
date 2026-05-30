@@ -1,13 +1,11 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/User.php');
-
+Core::loadModel("User");
 $userClass = new User();
 $users = $userClass->all();
 
@@ -16,8 +14,8 @@ $admins = count(array_filter($users, fn($u) => $u['role'] === 'admin'));
 $staff = count(array_filter($users, fn($u) => $u['role'] === 'staff'));
 $dentists = count(array_filter($users, fn($u) => $u['role'] === 'dentist'));
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -38,7 +36,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
             </div>
 
-            <a href="/admin/users/create"
+            <a href="<?= PROJECT_BASE ?>admin/users/create"
                 class="btn btn-primary">
 
                 <i class="bi bi-plus-circle"></i>
@@ -157,7 +155,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
                                     <td>
                                         <div class="d-flex gap-2">
-                                            <a href="/admin/users/edit?id=<?= $row['id'] ?>"
+                                            <a href="<?= PROJECT_BASE ?>admin/users/edit?id=<?= $row['id'] ?>"
                                                 class="btn btn-warning btn-sm">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
@@ -178,7 +176,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
             </div>
         </div>
     </div>
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 </div>
 
 <script>
@@ -193,7 +191,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
             e.preventDefault();
             let userId = $(this).data('id');
             let userName = $(this).data('name');
-            let deleteUrl = '/admin/users/delete?id=' + userId;
+            let deleteUrl = '<?= PROJECT_BASE ?>admin/users/delete?id=' + userId;
 
             alertify.confirm(
                 'Delete User',

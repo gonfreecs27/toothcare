@@ -1,22 +1,17 @@
 <?php
-session_start();
+require '../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
 $user = $_SESSION['user'];
 
-include __DIR__ . '/../../includes/header_app.php';
-include __DIR__ . '/../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
-    <button class="menu-toggle" id="menuToggle">
-        <i class="bi bi-list"></i>
-    </button>
-
     <div class="content">
 
         <!-- PAGE HEADER -->
@@ -331,6 +326,5 @@ include __DIR__ . '/../../includes/sidebar.php';
         </div>
     </div>
 
-    <?php include __DIR__ . '/../../includes/footer_app.php'; ?>
-
+    <?php Component::footer(); ?>
 </div>

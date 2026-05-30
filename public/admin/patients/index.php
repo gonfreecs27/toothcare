@@ -1,18 +1,16 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login.php");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/Patient.php');
-
+Core::loadModel("Patient");
 $patientClass = new Patient();
 $patients = $patientClass->all();
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -27,7 +25,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 <p class="text-muted mb-0">Manage clinic patients and records</p>
             </div>
 
-            <a href="/admin/patients/create" class="btn btn-primary">
+            <a href="<?= PROJECT_BASE ?>admin/patients/create" class="btn btn-primary">
                 <i class="bi bi-plus-circle"></i> Add Patient
             </a>
 
@@ -92,7 +90,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                                     <td>
                                         <div class="d-flex gap-2">
 
-                                            <a href="/admin/patients/edit?id=<?= $row['id'] ?>"
+                                            <a href="<?= PROJECT_BASE ?>admin/patients/edit?id=<?= $row['id'] ?>"
                                                 class="btn btn-warning btn-sm">
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
@@ -121,7 +119,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
     </div>
 
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 
 </div>
 
@@ -146,7 +144,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                 function() {
 
                     $.ajax({
-                        url: '/admin/patients/delete',
+                        url: "<?= PROJECT_BASE ?>admin/patients/delete",
                         type: 'POST',
                         dataType: 'json',
                         data: {

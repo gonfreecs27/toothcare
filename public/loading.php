@@ -1,6 +1,5 @@
 <?php
 require '../init.php';
-session_start();
 
 if (!isset($_SESSION['user'])) {
     Core::redirect("login");
@@ -9,12 +8,12 @@ if (!isset($_SESSION['user'])) {
 $role = $_SESSION['user']['role'];
 
 $routes = [
-    'admin' => '/admin/dashboard',
-    'dentist' => '/dentist/dashboard',
-    'staff' => '/staff/dashboard'
+    'admin' => PROJECT_BASE . 'admin/dashboard',
+    'dentist' => PROJECT_BASE . 'dentist/dashboard',
+    'staff' => PROJECT_BASE . 'staff/dashboard'
 ];
 
-$redirect = $routes[$role] ?? '/staff/dashboard';
+$redirect = $routes[$role] ?? PROJECT_BASE . 'staff/dashboard';
 ?>
 
 <!DOCTYPE html>

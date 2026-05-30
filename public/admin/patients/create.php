@@ -1,13 +1,11 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login.php");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/Patient.php');
-
+Core::loadModel("Patient");
 $patientClass = new Patient();
 
 $errors = [];
@@ -36,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // validation
     if ($form['firstname'] === '') $errors['firstname'] = "First name is required.";
     if ($form['lastname'] === '') $errors['lastname'] = "Last name is required.";
+    if ($form['email'] === '') $errors['email'] = "Email is required.";
 
     if (!empty($form['email']) && !filter_var($form['email'], FILTER_VALIDATE_EMAIL)) {
         $errors['email'] = "Invalid email format.";
@@ -52,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -67,7 +66,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
             </div>
 
             <?php if (!$success): ?>
-                <a href="/admin/patients" class="btn btn-outline-secondary">
+                <a href="<?= PROJECT_BASE ?>admin/patients" class="btn btn-outline-secondary">
                     <i class="bi bi-arrow-left"></i> Back
                 </a>
             <?php endif; ?>
@@ -88,11 +87,11 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
                     <div class="d-flex justify-content-center gap-2 mt-4">
 
-                        <a href="/admin/patients/create" class="btn btn-primary">
+                        <a href="<?= PROJECT_BASE ?>admin/patients/create" class="btn btn-primary">
                             <i class="bi bi-plus-circle"></i> Add New Patient
                         </a>
 
-                        <a href="/admin/patients" class="btn btn-light">
+                        <a href="<?= PROJECT_BASE ?>admin/patients" class="btn btn-light">
                             Back to List
                         </a>
 
@@ -191,7 +190,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
                             <!-- EMAIL -->
                             <div class="col-md-6">
-                                <label class="form-label">Email</label>
+                                <label class="form-label">Email *</label>
                                 <input type="email"
                                     name="email"
                                     class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
@@ -228,7 +227,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                                 <i class="bi bi-save"></i> Save Patient
                             </button>
 
-                            <a href="/admin/patients" class="btn btn-light">
+                            <a href="<?= PROJECT_BASE ?>admin/patients" class="btn btn-light">
                                 Cancel
                             </a>
 
@@ -243,5 +242,5 @@ include __DIR__ . '/../../../includes/sidebar.php';
 
     </div>
 
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 </div>

@@ -1,27 +1,23 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/User.php');
-
+Core::loadModel("User");
 $userClass = new User();
 
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    header("Location: /admin/users/");
-    exit;
+    Core::redirect("admin/users/");
 }
 
 $data = $userClass->find($id);
 
 if (!$data) {
-    header("Location: /admin/users/");
-    exit;
+    Core::redirect("admin/users/");
 }
 
 $error = '';
@@ -41,8 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ]);
 
         if ($updated) {
-            header("Location: /admin/users/");
-            exit;
+            Core::redirect("admin/users/");
         }
     } catch (PDOException $e) {
         if ($e->getCode() == 23000) {
@@ -55,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-include __DIR__ . '/../../../includes/header_app.php';
-include __DIR__ . '/../../../includes/sidebar.php';
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
@@ -145,7 +140,7 @@ include __DIR__ . '/../../../includes/sidebar.php';
                                     Update User
                                 </button>
 
-                                <a href="/admin/users/"
+                                <a href="<?= PROJECT_BASE ?>admin/users/"
                                     class="btn btn-light">
 
                                     Cancel
@@ -162,6 +157,6 @@ include __DIR__ . '/../../../includes/sidebar.php';
         </div>
     </div>
 
-    <?php include __DIR__ . '/../../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 
 </div>

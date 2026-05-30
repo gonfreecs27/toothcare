@@ -1,32 +1,25 @@
 <?php
-session_start();
+require '../../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /login.php");
-    exit;
+if (!Permission::hasAccess(['admin'])) {
+    Core::redirect("login");
 }
 
-require_once(__DIR__ . '/../../../models/User.php');
-
+Core::loadModel("User");
 $userClass = new User();
-
 $id = $_GET['id'] ?? null;
 
 if (!$id) {
-    header("Location: /admin/users/");
-    exit;
+    Core::redirect("admin/users/");
 }
 
 if ($id == $_SESSION['user']['id']) {
-    header("Location: /admin/users/?error=self_delete");
-    exit;
+    Core::redirect("admin/users/?error=self_delete");
 }
 
 try {
     $deleted = $userClass->delete($id);
-    header("Location: /admin/users/");
-    exit;
+    Core::redirect("admin/users/");
 } catch (PDOException $e) {
-    header("Location: /admin/users/?error=delete_failed");
-    exit;
+    Core::redirect("admin/users/?error=delete_failed");
 }

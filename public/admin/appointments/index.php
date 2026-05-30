@@ -19,7 +19,7 @@ require_once(__DIR__ . '/../../../includes/sidebar.php');
         <div class="d-flex justify-content-between align-items-center mb-3">
             <div>
                 <h3 class="fw-bold mb-0">Appointment Calendar</h3>
-                <small class="text-muted">ToothCare Scheduling System</small>
+                <small class="text-muted"><?= BRAND_NAME ?> Scheduling System</small>
             </div>
 
             <div class="d-flex gap-2">

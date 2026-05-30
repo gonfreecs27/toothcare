@@ -1,9 +1,9 @@
 <?php
-session_start();
+require '../../../init.php';
 
 header('Content-Type: application/json');
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+if (!Permission::hasAccess(['admin'])) {
     http_response_code(403);
     echo json_encode([
         'success' => false,
@@ -11,8 +11,6 @@ if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     ]);
     exit;
 }
-
-require_once(__DIR__ . '/../../../models/Patient.php');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -35,6 +33,7 @@ if (!$id) {
 }
 
 try {
+    Core::loadModel("Patient");
     $patientClass = new Patient();
 
     // check if exists first
@@ -56,9 +55,7 @@ try {
         'message' => 'Patient deleted successfully'
     ]);
 } catch (Exception $e) {
-
     http_response_code(500);
-
     echo json_encode([
         'success' => false,
         'message' => 'Server error: ' . $e->getMessage()

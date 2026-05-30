@@ -1,0 +1,40 @@
+RewriteEngine On
+
+# =========================
+# SECURITY / BASIC HARDENING
+# =========================
+
+Options -Indexes
+Options -MultiViews
+
+# Prevent direct access to hidden files
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+
+# =========================
+# CLEAN URLS (no .php)
+# =========================
+
+# Redirect /page.php -> /page
+RewriteCond %{THE_REQUEST} \s/+(.+?)\.php[\s?] [NC]
+RewriteRule ^(.+)\.php$ $1 [R=301,L]
+
+# Internally serve .php without extension
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+?)/?$ $1.php [L]
+
+# =========================
+# ROUTING SAFETY
+# =========================
+
+# If not a file or directory, go to 404 (or your front controller later)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . - [R=404,L]
+
+# =========================
+# CUSTOM 404
+# =========================
+
+ErrorDocument 404 /404.php

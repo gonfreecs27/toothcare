@@ -3,6 +3,8 @@
 /**
  * Base path of the project.
  * Used for generating URLs and routing.
+ * Update the project base if you will use domain, then enable .htaccess-prod
+ * define('PROJECT_BASE', '/');
  */
 define('PROJECT_BASE', '/toothcare/public/');
 
