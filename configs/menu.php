@@ -70,10 +70,10 @@ return [
         ],
 
         [
-            'title' => 'Reports',
-            'icon'  => 'bi bi-bar-chart-fill',
-            'url'   => '/admin/reports',
-            'pages' => ['reports.php']
+            'title' => 'Feedbacks',
+            'icon'  => 'bi bi-chat-dots-fill',
+            'url'   => '/admin/feedbacks',
+            'pages' => ['feedbacks.php']
         ]
 
     ],
