@@ -1,0 +1,102 @@
+.wizard-steps {
+    position: relative;
+}
+
+.wizard-step {
+    text-align: center;
+    flex: 1;
+}
+
+.step-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #e9ecef;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    font-size: 20px;
+}
+
+.wizard-step.active .step-icon {
+    background: #0d6efd;
+    color: #fff;
+}
+
+.wizard-step.completed .step-icon {
+    background: #198754;
+    color: #fff;
+}
+
+.status-chip,
+.payment-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .2px;
+    border: 1px solid transparent;
+}
+
+/* DOT */
+.status-chip .dot,
+.payment-chip .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+/* =========================
+   APPOINTMENT STATUS
+========================= */
+
+.chip-pending {
+    background: #fff8e1;
+    color: #b26a00;
+    border-color: #ffe0a3;
+}
+
+.chip-confirmed {
+    background: #e3f2fd;
+    color: #0d6efd;
+    border-color: #b6daff;
+}
+
+.chip-completed {
+    background: #e8f5e9;
+    color: #198754;
+    border-color: #b7e4c7;
+}
+
+.chip-cancelled {
+    background: #fdecea;
+    color: #dc3545;
+    border-color: #f5c2c7;
+}
+
+/* =========================
+   PAYMENT STATUS
+========================= */
+
+.chip-unpaid {
+    background: #fff3cd;
+    color: #b58105;
+    border-color: #ffe69c;
+}
+
+.chip-partial {
+    background: #e2e3ff;
+    color: #4f46e5;
+    border-color: #c7d2fe;
+}
+
+.chip-paid {
+    background: #d1e7dd;
+    color: #0f5132;
+    border-color: #a3cfbb;
+}

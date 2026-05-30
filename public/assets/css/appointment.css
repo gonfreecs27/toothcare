@@ -71,11 +71,11 @@
 }
 
 .legend-item.confirmed span {
-    background: #22c55e;
+    background: #3b82f6;
 }
 
 .legend-item.completed span {
-    background: #3b82f6;
+    background: #22c55e;
 }
 
 .legend-item.cancelled span {
@@ -113,16 +113,18 @@
 }
 
 .event-confirmed {
+    background: #3b82f6 !important;
+    color: #000 !important;
+}
+
+.event-completed {
     background: #22c55e !important;
     color: #fff;
 }
 
-.event-completed {
-    background: #3b82f6 !important;
-}
-
 .event-cancelled {
     background: #ef4444 !important;
+    color: #fff;
 }
 
 .fc-toolbar-title {

@@ -6,6 +6,22 @@ require_once "AppointmentService.php";
 class Appointment extends BaseModel {
     protected $table = "appointments";
 
+    protected $fields = [
+        'id',
+        'patient_id',
+        'dentist_id',
+        'appointment_start',
+        'appointment_end',
+        'status',
+        'payment_status',
+        'confirmed_at',
+        'completed_at',
+        'cancelled_at',
+        'reason',
+        'created_at',
+        'updated_at'
+    ];
+
     public function getAppointments($start = null, $end = null) {
         $params = [];
         $where = "";
@@ -84,22 +100,35 @@ class Appointment extends BaseModel {
     }
 
     public function update($id, $data) {
-        $this->execute("
-            UPDATE appointments
-            SET patient_id = ?, dentist_id = ?, appointment_start = ?, appointment_end = ?, status = ?, reason = ?
-            WHERE id = ?
-        ", [
-            $data['patient_id'],
-            $data['dentist_id'],
-            $data['appointment_start'],
-            $data['appointment_end'],
-            $data['status'],
-            $data['reason'],
-            $id
-        ]);
+        $fields = [];
+        $values = [];
 
-        $appointmentService = new AppointmentService();
-        $appointmentService->sync($id, $data['services'] ?? []);
+        foreach ($data as $key => $value) {
+            if (in_array($key, $this->fields) && $key != $this->primaryKey) {
+                $fields[] = "{$key} = ?";
+                $values[] = $value;
+            }
+        }
+
+        if (empty($fields)) {
+            return false;
+        }
+
+        $values[] = $id;
+
+        $sql = "
+            UPDATE {$this->table}
+            SET " . implode(', ', $fields) . "
+            WHERE id = ?
+        ";
+
+        $this->execute($sql, $values);
+
+        if (isset($data['services'])) {
+            $appointmentService = new AppointmentService();
+            $appointmentService->sync($id, $data['services']);
+        }
+
         return true;
     }
 
@@ -118,7 +147,6 @@ class Appointment extends BaseModel {
     }
 
     public function findConflict($dentist_id, $start_datetime, $end_datetime, $exclude_id = null) {
-
         $sql = "SELECT id FROM appointments
             WHERE dentist_id = ? AND status != 'cancelled'
             AND appointment_start < ? AND appointment_end > ?";

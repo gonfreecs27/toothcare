@@ -8,7 +8,8 @@ if (!Permission::hasAccess(['all'])) {
 Component::header(false, null, [
     PROJECT_BASE . 'assets/js/appointment.js'
 ], [
-    PROJECT_BASE . 'assets/css/appointment.css'
+    PROJECT_BASE . 'assets/css/appointment.css',
+    PROJECT_BASE . 'assets/css/wizard.css'
 ]);
 Component::sidebar();
 ?>
@@ -100,113 +101,346 @@ Component::sidebar();
     <?php Component::footer(); ?>
 </div>
 
-<div class="modal fade" id="appointmentModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
+<div class="modal fade" id="addAppointmentModal" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl modal-dialog-centered">
+        <div class="modal-content border-0 shadow">
 
-            <div class="modal-header">
-                <h5 class="modal-title">Appointment Info</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-
-            <div class="modal-body">
-                <div id="apptDetails"></div>
-            </div>
-
-            <div class="modal-footer">
-                <button id="btnDelete" class="btn btn-danger btn-sm">Delete</button>
-                <button id="btnEdit" class="btn btn-primary btn-sm">Edit</button>
-            </div>
-
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="addAppointmentModal" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg">
-
+            <!-- HEADER -->
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title">
-                    <i class="bi bi-calendar-plus me-2"></i>Manage Appointment
+                    <i class="bi bi-calendar2-plus me-2"></i>
+                    Manage Appointment
                 </h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+
+                <button
+                    type="button"
+                    class="btn-close btn-close-white"
+                    data-bs-dismiss="modal">
+                </button>
             </div>
 
-            <div class="modal-body">
+            <!-- PROGRESS -->
+            <div class="px-4 pt-4">
+
+                <div class="wizard-steps d-flex justify-content-between">
+
+                    <div class="wizard-step active" data-step="1">
+                        <div class="step-icon">
+                            <i class="bi bi-person-vcard"></i>
+                        </div>
+                        <small>Details</small>
+                    </div>
+
+                    <div class="wizard-step" data-step="2">
+                        <div class="step-icon">
+                            <i class="bi bi-heart-pulse"></i>
+                        </div>
+                        <small>Services</small>
+                    </div>
+
+                    <div class="wizard-step" data-step="3">
+                        <div class="step-icon">
+                            <i class="bi bi-credit-card"></i>
+                        </div>
+                        <small>Payment</small>
+                    </div>
+
+                    <div class="wizard-step" data-step="4">
+                        <div class="step-icon">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                        <small>Review</small>
+                    </div>
+
+                </div>
+
+                <div class="progress mt-3" style="height:6px;">
+                    <div
+                        id="wizardProgress"
+                        class="progress-bar"
+                        style="width:25%">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="modal-body px-4">
+
+                <!-- STATUS -->
+                <div class="card border-0 bg-light mb-4">
+                    <div class="card-body py-2">
+                        <div class="row">
+
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Appointment Status
+                                </small>
+
+                                <div>
+                                    <span id="appointmentStatusBadge" class="status-chip chip-pending">
+                                        <span class="dot"></span>
+                                        Pending
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Payment Status
+                                </small>
+
+                                <div>
+                                    <span id="paymentStatusBadge" class="payment-chip chip-unpaid">
+                                        <span class="dot"></span>
+                                        Unpaid
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
                 <form id="appointmentForm">
 
-                    <div class="mb-2">
-                        <label class="form-label">Patient</label>
-                        <select name="patient_id" class="form-select" required>
-                            <option value="">Select Patient</option>
-                        </select>
-                    </div>
+                    <!-- STEP 1 -->
+                    <div class="wizard-page" data-page="1">
 
-                    <div class="mb-2">
-                        <label class="form-label">Dentist</label>
-                        <select name="dentist_id" class="form-select" required>
-                            <option value="">Select Dentist</option>
-                        </select>
-                    </div>
+                        <h5 class="mb-3">
+                            <i class="bi bi-person-vcard me-2"></i>
+                            Appointment Details
+                        </h5>
 
-                    <div class="mb-2">
-                        <label class="form-label">Services</label>
-                        <select id="services" name="services[]" multiple placeholder="Select services..."></select>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Patient
+                            </label>
 
-                    <div class="mb-2">
-                        <label class="form-label">Total</label>
+                            <select
+                                name="patient_id"
+                                class="form-select"
+                                required>
+                                <option value="">
+                                    Select Patient
+                                </option>
+                            </select>
+                        </div>
 
-                        <div class="input-group">
-                            <span class="input-group-text">Php</span>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Dentist
+                            </label>
 
-                            <input
-                                type="text"
-                                id="servicesTotal"
+                            <select
+                                name="dentist_id"
+                                class="form-select"
+                                required>
+                                <option value="">
+                                    Select Dentist
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Reason for Visit
+                            </label>
+
+                            <textarea
+                                name="reason"
                                 class="form-control"
-                                value="0.00"
-                                readonly>
+                                rows="4">
+                            </textarea>
                         </div>
+
                     </div>
 
-                    <div class="mb-2">
-                        <label class="form-label">Date</label>
-                        <input type="date" name="appointment_date" class="form-control" required>
-                    </div>
+                    <!-- STEP 2 -->
+                    <div class="wizard-page d-none" data-page="2">
 
-                    <div class="row g-2">
-                        <div class="col-6">
-                            <label class="form-label">Start</label>
-                            <input type="time" name="start_time" class="form-control" required>
+                        <h5 class="mb-3">
+                            <i class="bi bi-heart-pulse me-2"></i>
+                            Services & Schedule
+                        </h5>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Services
+                            </label>
+
+                            <select
+                                id="services"
+                                name="services[]"
+                                multiple>
+                            </select>
                         </div>
-                        <div class="col-6">
-                            <label class="form-label">End</label>
-                            <input type="time" name="end_time" class="form-control" required>
+
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Total Amount
+                            </label>
+
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    ₱
+                                </span>
+
+                                <input
+                                    type="text"
+                                    id="servicesTotal"
+                                    class="form-control"
+                                    value="0.00"
+                                    readonly>
+                            </div>
                         </div>
+
+                        <div class="row g-3">
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Date
+                                </label>
+
+                                <input
+                                    type="date"
+                                    name="appointment_date"
+                                    class="form-control"
+                                    required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    Start Time
+                                </label>
+
+                                <input
+                                    type="time"
+                                    name="start_time"
+                                    class="form-control"
+                                    required>
+                            </div>
+
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    End Time
+                                </label>
+
+                                <input
+                                    type="time"
+                                    name="end_time"
+                                    class="form-control"
+                                    required>
+                            </div>
+
+                        </div>
+
                     </div>
 
-                    <div class="mb-2 mt-2">
-                        <label class="form-label">Status</label>
-                        <select name="status" class="form-select">
-                            <option value="pending">Pending</option>
-                            <option value="confirmed">Confirmed</option>
-                            <option value="completed">Completed</option>
-                            <option value="cancelled">Cancelled</option>
-                        </select>
+                    <!-- STEP 3 -->
+                    <div class="wizard-page d-none" data-page="3">
+
+                        <h5 class="mb-3">
+                            <i class="bi bi-credit-card me-2"></i>
+                            Payment Information
+                        </h5>
+
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+
+                                <div class="row">
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Amount
+                                        </label>
+
+                                        <input
+                                            type="text"
+                                            id="paymentAmount"
+                                            class="form-control"
+                                            readonly>
+
+                                    </div>
+
+                                    <div class="col-md-6">
+
+                                        <label class="form-label">
+                                            Payment Method
+                                        </label>
+
+                                        <select id="paymentMethod" class="form-select">
+                                            <option value="cash">Cash</option>
+                                            <option value="gcash">GCash</option>
+                                            <option value="maya">Maya</option>
+                                            <option value="card">Card</option>
+
+                                        </select>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="mb-2">
-                        <label class="form-label">Reason</label>
-                        <textarea name="reason" class="form-control" rows="2"></textarea>
+                    <!-- STEP 4 -->
+                    <div class="wizard-page d-none" data-page="4">
+
+                        <h5 class="mb-3">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Review & Actions
+                        </h5>
+
+                        <div
+                            id="appointmentReview"
+                            class="card border-0 bg-light">
+                            <div class="card-body"></div>
+                        </div>
+                        <div id="appointmentActions" class="d-flex gap-2 flex-wrap"></div>
                     </div>
 
                 </form>
+
             </div>
 
-            <div class="modal-footer border-0">
-                <button class="btn btn-light border" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" id="btnSaveAppointment">Save</button>
+            <!-- FOOTER -->
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-light border"
+                    data-bs-dismiss="modal">
+                    Close
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-outline-primary"
+                    id="btnPrevStep"
+                    style="display:none;">
+                    <i class="bi bi-arrow-left"></i>
+                    Previous
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-primary"
+                    id="btnNextStep">
+                    Next
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-success d-none"
+                    id="btnSaveAppointment">
+                    <i class="bi bi-check-lg"></i>
+                    Save Appointment
+                </button>
+
             </div>
 
         </div>

@@ -11,11 +11,11 @@ define('PROJECT_BASE', '/toothcare/public/');
 /**
  * Brand information
  */
-define('BRAND_NAME', 'HelloWorld');
+define('BRAND_NAME', 'ToothCare');
 define('PROJECT_VERSION', '1.0.0');
 
 /**
  * Split brand name (useful for styling logos or headers)
  */
-define('BRAND_NAME_FIRST', 'Hello');
-define('BRAND_NAME_SECOND', 'World');
+define('BRAND_NAME_FIRST', 'Tooth');
+define('BRAND_NAME_SECOND', 'Care');
