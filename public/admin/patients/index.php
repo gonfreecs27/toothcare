@@ -1,6 +1,6 @@
 <?php
 require '../../../init.php';
-Permission::authorize(['admin']);
+Permission::authorize(['admin', 'staff', 'dentist']);
 
 Core::loadModel("Patient");
 $patientClass = new Patient();

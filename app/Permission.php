@@ -16,14 +16,10 @@ class Permission {
 
     public static function authorize($roles = []) {
         if (!self::hasAccess($roles)) {
-            http_response_code(403);
             if (self::isAjax()) {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'Unauthorized access'
-                ]);
-                exit;
+                Response::error('Unauthorized access', 403);
             }
+            http_response_code(403);
             Core::redirect('login');
         }
     }

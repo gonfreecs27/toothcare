@@ -115,6 +115,15 @@ class Dentist extends BaseModel {
         ]);
     }
 
+    public function get_by_user_id($userId) {
+        return $this->fetch("
+            SELECT 
+                *
+            FROM dentists
+            WHERE user_id = ?
+        ", [$userId]);
+    }
+
     public function active() {
         return $this->fetchAll("
             SELECT 

@@ -1,6 +1,6 @@
 <?php
 require '../../../init.php';
-Permission::authorize(['admin']);
+Permission::authorize(['admin', 'staff', 'dentist']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     Response::error('Invalid request method', 405);

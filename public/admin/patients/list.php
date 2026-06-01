@@ -1,5 +1,6 @@
 <?php
 require '../../../init.php';
+Permission::authorize(['all']);
 
 try {
     Core::loadModel("Patient");

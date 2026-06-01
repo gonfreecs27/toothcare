@@ -113,17 +113,17 @@ return [
         ],
 
         [
-            'title' => 'My Schedule',
+            'title' => 'Appointments',
             'icon'  => 'bi bi-calendar-week-fill',
-            'url'   => 'dentist/schedule',
-            'pages' => ['schedule.php']
+            'url'   => 'admin/appointments',
+            'pages' => ['index.php']
         ],
 
         [
-            'title' => 'My Patients',
+            'title' => 'Patients',
             'icon'  => 'bi bi-person-lines-fill',
-            'url'   => 'dentist/patients',
-            'pages' => ['patients.php']
+            'url'   => 'admin/patients',
+            'pages' => ['index.php']
         ]
 
     ]

@@ -1,132 +1,154 @@
 <?php
-session_start();
+require '../../init.php';
+Permission::authorize(['dentist']);
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'dentist') {
-    header("Location: /login.php");
-    exit;
-}
+Core::loadModel("Appointment");
+Core::loadModel("Dentist");
 
 $user = $_SESSION['user'];
+$dentistModel = new Dentist();
+$dentist = $dentistModel->get_by_user_id($user['id']);
+$dentistId = $dentist['id'];
 
-include __DIR__ . '/../../includes/header_app.php';
-include __DIR__ . '/../../includes/sidebar.php';
+$appointmentModel = new Appointment();
+$todayAppointments = $appointmentModel->countTodayByDentist($dentistId);
+$pendingAppointments = $appointmentModel->countPendingByDentist($dentistId);
+$confirmedAppointments = $appointmentModel->countConfirmedByDentist($dentistId);
+$completedAppointments = $appointmentModel->countCompletedByDentist($dentistId);
+$patientsThisMonth = $appointmentModel->countPatientsThisMonthByDentist($dentistId);
+
+$todaySchedule = $appointmentModel->todayScheduleByDentist($dentistId, 8);
+
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
-
     <div class="content">
 
-        <!-- HEADER -->
         <div class="dashboard-header mb-4">
 
             <div>
 
                 <h3 class="fw-bold mb-1">
-                    Dentist Dashboard
+                    Welcome back,
+                    <span class="text-primary">
+                        Dr. <?= htmlspecialchars($user['name']) ?>
+                    </span>
                 </h3>
 
                 <p class="text-muted mb-0">
-
-                    Welcome back,
-                    <span class="text-primary fw-semibold">
-                        Dr. <?= htmlspecialchars($user['name']) ?>
-                    </span>
-
+                    Here's your schedule and appointment overview.
                 </p>
 
             </div>
 
             <div class="dashboard-date">
-
                 <i class="bi bi-calendar3"></i>
-
                 <?= date('F d, Y') ?>
-
             </div>
 
         </div>
 
-        <!-- STATS -->
+        <!-- Statistics -->
         <div class="row g-4">
 
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-3 col-md-6">
 
-                <div class="dashboard-card appointments-card">
+                <div class="dashboard-card card-appointments">
 
                     <div class="card-icon">
                         <i class="bi bi-calendar2-check-fill"></i>
                     </div>
 
-                    <div>
-
+                    <div class="card-details">
                         <span class="card-title">
                             Today's Appointments
                         </span>
 
                         <h2 class="card-value">
-                            12
-                        </h2>
-
-                        <small class="text-success">
-                            3 upcoming schedules
-                        </small>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <div class="col-lg-4 col-md-6">
-
-                <div class="dashboard-card patients-card">
-
-                    <div class="card-icon">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-
-                    <div>
-
-                        <span class="card-title">
-                            Active Patients
-                        </span>
-
-                        <h2 class="card-value">
-                            48
+                            <?= $todayAppointments ?>
                         </h2>
 
                         <small class="text-muted">
-                            Under your care
+                            Scheduled today
                         </small>
-
                     </div>
 
                 </div>
 
             </div>
 
-            <div class="col-lg-4 col-md-6">
+            <div class="col-lg-3 col-md-6">
 
                 <div class="dashboard-card card-revenue">
 
                     <div class="card-icon">
-                        <i class="bi bi-clipboard2-pulse-fill"></i>
+                        <i class="bi bi-hourglass-split"></i>
                     </div>
 
-                    <div>
-
+                    <div class="card-details">
                         <span class="card-title">
-                            Completed Treatments
+                            Pending
                         </span>
 
                         <h2 class="card-value">
-                            26
+                            <?= $pendingAppointments ?>
+                        </h2>
+
+                        <small class="text-warning">
+                            Awaiting confirmation
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="dashboard-card card-dentists">
+
+                    <div class="card-icon">
+                        <i class="bi bi-check-circle-fill"></i>
+                    </div>
+
+                    <div class="card-details">
+                        <span class="card-title">
+                            Confirmed
+                        </span>
+
+                        <h2 class="card-value">
+                            <?= $confirmedAppointments ?>
                         </h2>
 
                         <small class="text-primary">
-                            This month
+                            Upcoming appointments
                         </small>
+                    </div>
 
+                </div>
+
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div class="dashboard-card card-patients">
+                    <div class="card-icon">
+                        <i class="bi bi-people-fill"></i>
+                    </div>
+
+                    <div class="card-details">
+                        <span class="card-title">
+                            Patients This Month
+                        </span>
+
+                        <h2 class="card-value">
+                            <?= $patientsThisMonth ?>
+                        </h2>
+
+                        <small class="text-success">
+                            Treated this month
+                        </small>
                     </div>
 
                 </div>
@@ -135,13 +157,72 @@ include __DIR__ . '/../../includes/sidebar.php';
 
         </div>
 
-        <!-- CONTENT -->
         <div class="row mt-4 g-4">
 
-            <!-- LEFT -->
+            <!-- Overview -->
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm border-0">
+
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-4">
+                            Appointment Overview
+                        </h5>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Pending</span>
+                            <strong><?= $pendingAppointments ?></strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+                            <span>Confirmed</span>
+                            <strong><?= $confirmedAppointments ?></strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-4">
+                            <span>Completed</span>
+                            <strong><?= $completedAppointments ?></strong>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold mb-3">
+                            Quick Actions
+                        </h6>
+
+                        <div class="d-grid gap-2">
+
+                            <a href="<?= PROJECT_BASE ?>dentist/appointments"
+                                class="btn btn-outline-primary">
+                                <i class="bi bi-calendar-week me-2"></i>
+                                My Schedule
+                            </a>
+
+                            <a href="<?= PROJECT_BASE ?>dentist/appointments"
+                                class="btn btn-outline-success">
+                                <i class="bi bi-calendar2-check me-2"></i>
+                                Manage Appointments
+                            </a>
+
+                            <a href="<?= PROJECT_BASE ?>dentist/patients"
+                                class="btn btn-outline-info">
+                                <i class="bi bi-people-fill me-2"></i>
+                                View Patients
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Today's Schedule -->
             <div class="col-lg-8">
 
-                <div class="card dashboard-panel shadow-sm border-0">
+                <div class="card shadow-sm border-0">
 
                     <div class="card-body">
 
@@ -154,270 +235,89 @@ include __DIR__ . '/../../includes/sidebar.php';
                                 </h5>
 
                                 <p class="text-muted small mb-0">
-                                    Upcoming consultations and procedures
+                                    Your appointments today
                                 </p>
 
                             </div>
 
-                            <a href="/dentist/schedule.php"
+                            <a href="<?= PROJECT_BASE ?>dentist/appointments"
                                 class="btn btn-light btn-sm">
-
-                                View Full Schedule
-
+                                View All
                             </a>
 
                         </div>
 
-                        <div class="schedule-list">
+                        <?php if (empty($todaySchedule)): ?>
 
-                            <div class="schedule-item">
+                            <div class="text-center py-5">
 
-                                <div class="schedule-time">
-                                    9:00 AM
-                                </div>
+                                <i class="bi bi-calendar-x fs-1 text-muted"></i>
 
-                                <div class="schedule-info">
-
-                                    <div class="fw-semibold">
-                                        Anna Reyes
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Dental Cleaning
-                                    </small>
-
-                                </div>
-
-                                <span class="badge bg-success-subtle text-success">
-                                    Confirmed
-                                </span>
-
-                            </div>
-
-                            <div class="schedule-item">
-
-                                <div class="schedule-time">
-                                    11:00 AM
-                                </div>
-
-                                <div class="schedule-info">
-
-                                    <div class="fw-semibold">
-                                        Michael Santos
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Root Canal Procedure
-                                    </small>
-
-                                </div>
-
-                                <span class="badge bg-primary-subtle text-primary">
-                                    Ongoing
-                                </span>
-
-                            </div>
-
-                            <div class="schedule-item">
-
-                                <div class="schedule-time">
-                                    2:00 PM
-                                </div>
-
-                                <div class="schedule-info">
-
-                                    <div class="fw-semibold">
-                                        Carla Mendoza
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Tooth Extraction
-                                    </small>
-
-                                </div>
-
-                                <span class="badge bg-warning-subtle text-warning">
-                                    Pending
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="card dashboard-panel shadow-sm border-0 mt-4">
-
-                    <div class="card-body">
-
-                        <div class="d-flex justify-content-between align-items-center mb-4">
-
-                            <div>
-
-                                <h5 class="fw-bold mb-1">
-                                    Recent Patient Activity
-                                </h5>
-
-                                <p class="text-muted small mb-0">
-                                    Latest updates from your patients
+                                <p class="text-muted mt-3 mb-0">
+                                    No appointments scheduled today.
                                 </p>
 
                             </div>
 
-                        </div>
+                        <?php else: ?>
 
-                        <div class="activity-list">
+                            <div class="table-responsive">
 
-                            <div class="activity-item">
+                                <table class="table align-middle">
 
-                                <div class="activity-icon bg-primary-subtle text-primary">
-                                    <i class="bi bi-file-earmark-medical"></i>
-                                </div>
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Patient</th>
+                                            <th>Purpose</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
 
-                                <div class="activity-content">
+                                    <tbody>
 
-                                    <div class="fw-semibold">
-                                        Treatment record updated
-                                    </div>
+                                        <?php foreach ($todaySchedule as $row): ?>
 
-                                    <small class="text-muted">
-                                        Updated procedure notes for Maria Cruz
-                                    </small>
+                                            <?php
+                                            $badge = [
+                                                'pending' => 'warning',
+                                                'confirmed' => 'primary',
+                                                'completed' => 'success',
+                                                'cancelled' => 'danger'
+                                            ];
+                                            ?>
 
-                                </div>
+                                            <tr>
 
-                                <small class="text-muted">
-                                    20 mins ago
-                                </small>
+                                                <td>
+                                                    <?= date('h:i A', strtotime($row['appointment_start'])) ?>
+                                                </td>
 
-                            </div>
+                                                <td>
+                                                    <?= htmlspecialchars($row['patient_name']) ?>
+                                                </td>
 
-                            <div class="activity-item">
+                                                <td>
+                                                    <?= htmlspecialchars($row['reason']) ?>
+                                                </td>
 
-                                <div class="activity-icon bg-success-subtle text-success">
-                                    <i class="bi bi-check-circle"></i>
-                                </div>
+                                                <td>
+                                                    <span class="badge bg-<?= $badge[$row['status']] ?? 'secondary' ?>">
+                                                        <?= ucfirst($row['status']) ?>
+                                                    </span>
+                                                </td>
 
-                                <div class="activity-content">
+                                            </tr>
 
-                                    <div class="fw-semibold">
-                                        Procedure completed
-                                    </div>
+                                        <?php endforeach; ?>
 
-                                    <small class="text-muted">
-                                        Dental filling completed successfully
-                                    </small>
+                                    </tbody>
 
-                                </div>
-
-                                <small class="text-muted">
-                                    1 hour ago
-                                </small>
-
-                            </div>
-
-                            <div class="activity-item">
-
-                                <div class="activity-icon bg-warning-subtle text-warning">
-                                    <i class="bi bi-clock-history"></i>
-                                </div>
-
-                                <div class="activity-content">
-
-                                    <div class="fw-semibold">
-                                        Appointment rescheduled
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Patient moved consultation to Friday
-                                    </small>
-
-                                </div>
-
-                                <small class="text-muted">
-                                    2 hours ago
-                                </small>
+                                </table>
 
                             </div>
 
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- RIGHT -->
-            <div class="col-lg-4">
-
-                <div class="card dashboard-panel shadow-sm border-0 mb-4">
-
-                    <div class="card-body">
-
-                        <h5 class="fw-bold mb-4">
-                            Quick Actions
-                        </h5>
-
-                        <div class="d-grid gap-3">
-
-                            <a href="/dentist/schedule.php"
-                                class="quick-action-btn">
-
-                                <i class="bi bi-calendar-week-fill"></i>
-
-                                <span>
-                                    View Schedule
-                                </span>
-
-                            </a>
-
-                            <a href="/dentist/patients.php"
-                                class="quick-action-btn">
-
-                                <i class="bi bi-person-lines-fill"></i>
-
-                                <span>
-                                    Manage Patients
-                                </span>
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="card dashboard-panel shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <h5 class="fw-bold mb-3">
-                            Reminders
-                        </h5>
-
-                        <div class="alert alert-light border">
-
-                            <small class="text-muted">
-
-                                Ensure treatment records are updated after every consultation.
-
-                            </small>
-
-                        </div>
-
-                        <div class="alert alert-light border mb-0">
-
-                            <small class="text-muted">
-
-                                Review tomorrow's appointments before end of shift.
-
-                            </small>
-
-                        </div>
+                        <?php endif; ?>
 
                     </div>
 
@@ -429,6 +329,6 @@ include __DIR__ . '/../../includes/sidebar.php';
 
     </div>
 
-    <?php include __DIR__ . '/../../includes/footer_app.php'; ?>
+    <?php Component::footer(); ?>
 
 </div>

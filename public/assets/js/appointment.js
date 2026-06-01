@@ -388,7 +388,6 @@ $(document).ready(function () {
 
             type: 'POST',
             data: $.param(formData),
-
             success(res) {
                 $modal.modal('hide');
                 resetForm();
@@ -652,18 +651,18 @@ $(document).ready(function () {
                     This appointment is completed and locked.
                 </div>
             `;
-        }
-
-        // =====================
-        // PAYMENT INDICATOR
-        // =====================
-        if (isPaid) {
-            html += `
-                <div class="text-success small mt-2">
-                    <i class="bi bi-check-circle-fill me-1"></i>
-                    Payment completed
-                </div>
-            `;
+        } else {
+            // =====================
+            // PAYMENT INDICATOR
+            // =====================
+            if (isPaid) {
+                html += `
+                    <div class="text-success small mt-2">
+                        <i class="bi bi-check-circle-fill me-1"></i>
+                        Payment completed
+                    </div>
+                `;
+            }
         }
 
         $('#appointmentActions').html(html);

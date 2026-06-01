@@ -1,7 +1,6 @@
 <?php
 require '../../../init.php';
-
-Permission::authorize(['admin']);
+Permission::authorize(['all']);
 
 try {
     Core::loadModel("Service");

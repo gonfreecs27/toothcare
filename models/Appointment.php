@@ -254,4 +254,117 @@ class Appointment extends BaseModel {
             LIMIT {$limit}
         ");
     }
+
+    public function countTodayByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND DATE(appointment_start) = CURDATE()
+    ", [$dentistId])['total'];
+    }
+
+    public function countPendingByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'pending'
+    ", [$dentistId])['total'];
+    }
+
+    public function countConfirmedByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'confirmed'
+    ", [$dentistId])['total'];
+    }
+
+    public function countCompletedByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'completed'
+    ", [$dentistId])['total'];
+    }
+
+    public function countUpcomingByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'confirmed'
+        AND appointment_start >= NOW()
+    ", [$dentistId])['total'];
+    }
+
+    public function countCompletedTodayByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'completed'
+        AND DATE(completed_at) = CURDATE()
+    ", [$dentistId])['total'];
+    }
+
+    public function countCancelledThisMonthByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(*) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'cancelled'
+        AND YEAR(appointment_start) = YEAR(CURDATE())
+        AND MONTH(appointment_start) = MONTH(CURDATE())
+    ", [$dentistId])['total'];
+    }
+
+    public function countPatientsThisMonthByDentist($dentistId) {
+        return $this->fetch("
+        SELECT COUNT(DISTINCT patient_id) AS total
+        FROM appointments
+        WHERE dentist_id = ?
+        AND status = 'completed'
+        AND YEAR(appointment_start) = YEAR(CURDATE())
+        AND MONTH(appointment_start) = MONTH(CURDATE())
+    ", [$dentistId])['total'];
+    }
+
+    public function todayScheduleByDentist($dentistId, $limit = 10) {
+        $limit = (int) $limit;
+
+        return $this->fetchAll("
+        SELECT
+            a.*,
+            CONCAT(p.firstname,' ',p.lastname) AS patient_name,
+            CONCAT(d.firstname,' ',d.lastname) AS dentist_name
+        FROM appointments a
+        JOIN patients p ON p.id = a.patient_id
+        JOIN dentists d ON d.id = a.dentist_id
+        WHERE a.dentist_id = ?
+        AND DATE(a.appointment_start) = CURDATE()
+        ORDER BY a.appointment_start ASC
+        LIMIT {$limit}
+    ", [$dentistId]);
+    }
+
+    public function upcomingAppointmentsByDentist($dentistId, $limit = 5) {
+        $limit = (int) $limit;
+
+        return $this->fetchAll("
+        SELECT
+            a.*,
+            CONCAT(p.firstname,' ',p.lastname) AS patient_name
+        FROM appointments a
+        JOIN patients p ON p.id = a.patient_id
+        WHERE a.dentist_id = ?
+        AND a.status = 'confirmed'
+        AND a.appointment_start >= NOW()
+        ORDER BY a.appointment_start ASC
+        LIMIT {$limit}
+    ", [$dentistId]);
+    }
 }
