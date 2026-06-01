@@ -297,6 +297,9 @@ $(document).ready(function () {
                 },
                 success: function (response) {
                     successCallback(response.events);
+                    $("div.stat-card").each((a, b) => {
+                        $(b).find("h3").html("0");
+                    });
                     $.each(response.tally, (a, b) => {
                         $(`h3#${a}`).html(b);
                     });
@@ -641,11 +644,11 @@ $(document).ready(function () {
 
     function updatePaymentStatus(status) {
         $.ajax({
-            url: App.endpoint('admin/appointments/update_payment'),
+            url: App.endpoint('admin/appointments/update_status'),
             type: 'POST',
             data: {
                 id: selectedEventId,
-                status: 'completed',
+                status: 'confirmed',
                 payment_status: status
             },
             success: function (response) {

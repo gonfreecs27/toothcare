@@ -61,14 +61,14 @@ Component::sidebar();
 
         <div class="row g-3 mb-3">
             <div class="col-md-3">
-                <div class="stat-card bg-primary-subtle">
-                    <h6>Total</h6>
-                    <h3 id="totalAppointments">0</h3>
+                <div class="stat-card bg-success-subtle">
+                    <h6>Completed</h6>
+                    <h3 id="completedAppointments">0</h3>
                 </div>
             </div>
 
             <div class="col-md-3">
-                <div class="stat-card bg-success-subtle">
+                <div class="stat-card bg-primary-subtle">
                     <h6>Confirmed</h6>
                     <h3 id="confirmedAppointments">0</h3>
                 </div>
@@ -249,8 +249,7 @@ Component::sidebar();
                             <textarea
                                 name="reason"
                                 class="form-control"
-                                rows="4">
-                            </textarea>
+                                rows="4"></textarea>
                         </div>
 
                     </div>

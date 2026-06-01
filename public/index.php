@@ -5,6 +5,30 @@ if (isset($_SESSION['user'])) {
     Core::redirect("loading");
 }
 
+Core::loadModel("Appointment");
+Core::loadModel("Feedback");
+Core::loadModel("Service");
+Core::loadModel("Dentist");
+Core::loadModel("Patient");
+
+$feedbackModel = new Feedback();
+$appointmentModel = new Appointment();
+$serviceModel = new Service();
+$dentistModel = new Dentist();
+$patientModel = new Patient();
+
+$avgRating = $feedbackModel->averageRating();
+$totalFeedbacks = $feedbackModel->totalApproved();
+
+$monthlyAppointments = $appointmentModel->appointmentsThisMonth();
+$totalAppointments = $appointmentModel->totalAppointments();
+
+$totalPatients = $patientModel->countPatients();
+$totalDentists = $dentistModel->countActiveDentists();
+$totalServices = $serviceModel->totalServices();
+
+$featuredFeedbacks = $feedbackModel->getFeatured();
+
 Component::header(true);
 ?>
 
@@ -73,18 +97,15 @@ Component::header(true);
 
                 <div class="hero-floating-card card-1">
                     <i class="bi bi-calendar-check-fill"></i>
-                    120+ Monthly Appointments
+                    <?= number_format($monthlyAppointments) ?> Monthly Appointments
                 </div>
 
                 <div class="hero-floating-card card-2">
                     <i class="bi bi-star-fill"></i>
-                    4.9 Patient Rating
+                    <?= $avgRating ?> Patient Rating
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
 </section>
@@ -94,17 +115,17 @@ Component::header(true);
         <div class="row text-center">
 
             <div class="col-md-3">
-                <h3>500+</h3>
-                <p>Patients Served</p>
+                <h3><?= number_format($totalAppointments); ?></h3>
+                <p>Total Appointments</p>
             </div>
 
             <div class="col-md-3">
-                <h3>10+</h3>
+                <h3><?= number_format($totalServices); ?></h3>
                 <p>Dental Services</p>
             </div>
 
             <div class="col-md-3">
-                <h3>98%</h3>
+                <h3><?= number_format($totalFeedbacks); ?></h3>
                 <p>Patient Satisfaction</p>
             </div>
 
@@ -219,15 +240,15 @@ Component::header(true);
             <div class="row g-3">
 
                 <div class="col-6">
-                    <?php Component::statBox("500+", "Patients"); ?>
+                    <?php Component::statBox(number_format($totalPatients), "Patients"); ?>
                 </div>
 
                 <div class="col-6">
-                    <?php Component::statBox("10+", "Services"); ?>
+                    <?php Component::statBox(number_format($totalServices), "Services"); ?>
                 </div>
 
                 <div class="col-6">
-                    <?php Component::statBox("5", "Dentists"); ?>
+                    <?php Component::statBox(number_format($totalDentists), "Dentists"); ?>
                 </div>
 
                 <div class="col-6">
@@ -240,5 +261,59 @@ Component::header(true);
     </div>
 
 </section>
+
+<?php if (!empty($featuredFeedbacks)): ?>
+
+    <section class="container py-5">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">
+                What Our Patients Say
+            </h2>
+
+            <p class="text-muted">
+                Real feedback from our patients.
+            </p>
+        </div>
+
+        <div class="row g-4">
+
+            <?php foreach ($featuredFeedbacks as $feedback): ?>
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+
+                        <div class="card-body">
+
+                            <div class="mb-3 text-warning">
+
+                                <?php for ($i = 1; $i <= 5; $i++): ?>
+
+                                    <i class="bi bi-star-fill <?= $i <= $feedback['rating'] ? '' : 'text-secondary' ?>"></i>
+
+                                <?php endfor; ?>
+
+                            </div>
+
+                            <p class="text-muted">
+                                "<?= htmlspecialchars($feedback['message']) ?>"
+                            </p>
+
+                            <div class="fw-bold">
+                                <?= htmlspecialchars($feedback['name']) ?>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    </section>
+
+<?php endif; ?>
 
 <?php Component::footer(true); ?>

@@ -47,4 +47,10 @@ class Patient extends BaseModel {
             ]
         );
     }
+
+    public function countPatients() {
+        return $this->fetch(
+            "SELECT COUNT(*) AS total FROM patients"
+        )['total'];
+    }
 }

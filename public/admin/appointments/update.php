@@ -56,6 +56,15 @@ try {
         throw new Exception('Select a service.');
     }
 
+    $appointment = $appointmentClass->find($id);
+    if ($appointment['status'] == 'completed') {
+        throw new Exception("This transaction has already been completed.");
+    }
+
+    if ($appointment['status'] == 'cancelled') {
+        throw new Exception("This transaction has already been cancelled.");
+    }
+
     $startDateTime = DateTime::createFromFormat('Y-m-d H:i', "$date $start_time");
     $endDateTime   = DateTime::createFromFormat('Y-m-d H:i', "$date $end_time");
 

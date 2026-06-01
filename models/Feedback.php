@@ -120,4 +120,41 @@ class Feedback extends BaseModel {
             WHERE status = 'approved'
         ")['average_rating'] ?? 0;
     }
+
+    public function totalApproved() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM feedbacks
+            WHERE status = 'approved'
+        ")['total'];
+    }
+
+    public function allWithLatestFirst() {
+        return $this->fetchAll("
+            SELECT *
+            FROM feedbacks
+            ORDER BY created_at DESC
+        ");
+    }
+
+    public function approve($id) {
+        return $this->update($id, [
+            'status' => 'approved'
+        ]);
+    }
+
+    public function reject($id) {
+        return $this->update($id, [
+            'status' => 'rejected',
+            'is_featured' => 0
+        ]);
+    }
+
+    public function toggleFeatured($id) {
+        $feedback = $this->find($id);
+
+        return $this->update($id, [
+            'is_featured' => $feedback['is_featured'] ? 0 : 1
+        ]);
+    }
 }

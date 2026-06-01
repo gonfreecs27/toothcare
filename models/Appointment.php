@@ -171,4 +171,75 @@ class Appointment extends BaseModel {
 
         return $result;
     }
+
+    public function totalAppointments() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+        ")['total'];
+    }
+
+    public function appointmentsThisMonth() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE YEAR(appointment_start)=YEAR(CURDATE())
+            AND MONTH(appointment_start)=MONTH(CURDATE())
+        ")['total'];
+    }
+
+    public function countToday() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE DATE(appointment_start) = CURDATE()
+        ")['total'];
+    }
+
+    public function countPending() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE status = 'pending'
+        ")['total'];
+    }
+
+    public function countConfirmed() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE status = 'confirmed'
+        ")['total'];
+    }
+
+    public function countCompleted() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE status = 'completed'
+        ")['total'];
+    }
+
+    public function countCancelled() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM appointments
+            WHERE status = 'cancelled'
+        ")['total'];
+    }
+
+    public function todaySchedule($limit = 10) {
+        return $this->fetchAll("
+            SELECT
+                a.*,
+                CONCAT(p.firstname,' ',p.lastname) AS patient_name,
+                CONCAT(d.firstname,' ',d.lastname) AS dentist_name
+            FROM appointments a
+            JOIN patients p ON p.id = a.patient_id
+            JOIN dentists d ON d.id = a.dentist_id
+            WHERE DATE(a.appointment_start) = CURDATE()
+            ORDER BY a.appointment_start ASC
+            LIMIT {$limit}
+        ");
+    }
 }

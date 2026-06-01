@@ -14,6 +14,24 @@ class Permission {
         return in_array($_SESSION['user']['role'], $allowedRoles) || in_array('all', $allowedRoles);
     }
 
+    public static function authorize($roles = []) {
+        if (!self::hasAccess($roles)) {
+            http_response_code(403);
+            if (self::isAjax()) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => 'Unauthorized access'
+                ]);
+                exit;
+            }
+            Core::redirect('login');
+        }
+    }
+
+    private static function isAjax() {
+        return (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest');
+    }
+
     public static function activeMenu(string $baseUrl, array $pages = []): string {
         $currentPath = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
         $baseUrl = rtrim($baseUrl, '/');

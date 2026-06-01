@@ -126,4 +126,12 @@ class Dentist extends BaseModel {
             ORDER BY u.name ASC
         ");
     }
+
+    public function countActiveDentists() {
+        return $this->fetch(
+            "SELECT COUNT(*) AS total
+         FROM dentists
+         WHERE status = 'active'"
+        )['total'];
+    }
 }

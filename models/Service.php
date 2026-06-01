@@ -86,4 +86,11 @@ class Service extends BaseModel {
             $id
         ]);
     }
+
+    public function totalServices() {
+        return $this->fetch("
+            SELECT COUNT(*) AS total
+            FROM services
+        ")['total'];
+    }
 }
