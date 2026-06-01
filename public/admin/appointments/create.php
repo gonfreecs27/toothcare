@@ -3,7 +3,10 @@ require '../../../init.php';
 Permission::authorize(['admin', 'staff']);
 
 Core::loadModel("Appointment");
+Core::loadModel("Payment");
+
 $appointmentClass = new Appointment();
+$paymentClass = new Payment();
 
 try {
     $patient_id = trim($_POST['patient_id'] ?? '');
@@ -13,10 +16,8 @@ try {
     $end_time = trim($_POST['end_time'] ?? '');
     $status = trim($_POST['status'] ?? 'pending');
     $reason = trim($_POST['reason'] ?? '');
-
     $services = $_POST['services'] ?? [];
 
-    // convert to integers & remove invalid values
     $services = array_values(array_filter(array_map('intval', $services)));
 
     if (!$patient_id) {
@@ -57,17 +58,13 @@ try {
     $start = $startDateTime->format('Y-m-d H:i:s');
     $end   = $endDateTime->format('Y-m-d H:i:s');
 
-    $existing = $appointmentClass->findConflict(
-        $dentist_id,
-        $start,
-        $end
-    );
+    $existing = $appointmentClass->findConflict($dentist_id, $start, $end);
 
     if ($existing) {
         throw new Exception('Dentist already has an appointment at this time');
     }
 
-    $created = $appointmentClass->create([
+    $appointmentId = $appointmentClass->create([
         'patient_id' => $patient_id,
         'dentist_id' => $dentist_id,
         'appointment_start' => $start,
@@ -77,9 +74,14 @@ try {
         'services' => $services
     ]);
 
-    if (!$created) {
+    if (!$appointmentId) {
         throw new Exception('Failed to save appointment');
     }
+
+    $paymentClass->createFromAppointment($appointmentId, [
+        'payment_method' => 'cash',
+        'reference_no' => $paymentClass->generateReferenceNo()
+    ]);
 
     Response::success('Appointment created successfully');
 } catch (Exception $e) {

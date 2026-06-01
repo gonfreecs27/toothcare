@@ -1,5 +1,6 @@
 <?php
 require '../../../init.php';
+
 Permission::authorize(['admin', 'staff']);
 
 try {
@@ -14,12 +15,6 @@ try {
         Response::error('Missing required fields', 422);
     }
 
-    $allowedStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
-
-    if (!in_array($status, $allowedStatuses)) {
-        Response::error('Invalid status', 422);
-    }
-
     $appointment = $appointmentClass->find($id);
 
     if (!$appointment) {
@@ -27,53 +22,52 @@ try {
     }
 
     // =========================
-    // BUSINESS RULES (STATE MACHINE)
+    // STATE MACHINE
     // =========================
     $currentStatus = $appointment['status'];
 
     $allowedTransitions = [
         'pending' => ['confirmed', 'cancelled'],
-        'confirmed' => ['completed', 'cancelled'],
+        'confirmed' => ['confirmed', 'completed', 'cancelled'],
         'cancelled' => ['pending'],
         'completed' => ['completed']
     ];
 
-    if (!in_array($status, $allowedTransitions[$currentStatus])) {
+    if (
+        !isset($allowedTransitions[$currentStatus]) ||
+        !in_array($status, $allowedTransitions[$currentStatus])
+    ) {
         Response::error("Cannot change status from {$currentStatus} to {$status}", 403);
     }
 
     // =========================
-    // UPDATE STATUS
+    // PAYMENT HANDLING
+    // =========================
+    if ($paymentStatus === 'paid') {
+        $appointmentClass->markAsPaid($id, [
+            'payment_method' => $_POST['payment_method'] ?? 'cash',
+            'reference_no' => $_POST['reference_no'] ?? null
+        ]);
+    }
+
+    // =========================
+    // UPDATE DATA
     // =========================
     $updateData = [
         'status' => $status,
+        'payment_status' => $paymentStatus ?? $appointment['payment_status'],
         'updated_at' => date('Y-m-d H:i:s')
     ];
 
-    if ($paymentStatus) {
-        $updateData['payment_status'] = $paymentStatus;
-    }
-
     $now = date('Y-m-d H:i:s');
-    switch ($status) {
-        case 'completed':
-            $updateData['completed_at'] = $now;
-            break;
 
-        case 'confirmed':
-            $updateData['confirmed_at'] = $now;
-            break;
-
-        case 'cancelled':
-            $updateData['cancelled_at'] = $now;
-            break;
-    }
+    if ($status === 'confirmed') $updateData['confirmed_at'] = $now;
+    if ($status === 'completed') $updateData['completed_at'] = $now;
+    if ($status === 'cancelled') $updateData['cancelled_at'] = $now;
 
     $appointmentClass->update($id, $updateData);
 
-    // Need to add also the payment transaction
-
-    Response::success('Appointment status updated successfully');
+    Response::success('Appointment updated successfully');
 } catch (Exception $e) {
     Response::error('Server error', 500);
 }

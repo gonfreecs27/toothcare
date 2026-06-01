@@ -176,6 +176,9 @@ $(document).ready(function () {
             serviceSelect.clear();
         }
 
+        renderStatus('pending');
+        renderPaymentStatus('unpaid');
+
         $('#servicesTotal').val('0.00');
         $('#appointmentActions').html('');
         $('#btnSaveAppointment')
@@ -428,6 +431,8 @@ $(document).ready(function () {
 
         $('textarea[name="reason"]').val(event.extendedProps.reason);
         let paymentAmount = event.extendedProps.payment_amount ?? $("#servicesTotal").val() ?? 0;
+        $('select[name="dentist_id"]').val(event.extendedProps.dentist_id);
+        $('select[name="payment_method"]').val(event.extendedProps.payment_method ?? '');
         $('#paymentAmount').val(paymentAmount);
 
         renderStatus(event.extendedProps.status);
@@ -469,7 +474,7 @@ $(document).ready(function () {
     // SERVICES
     // =========================
     function loadServices() {
-        $.get(App.endpoint('admin/services/list'),{
+        $.get(App.endpoint('admin/services/list'), {
             limit: 1000
         }, function (response) {
             const $select = $('#services');
@@ -557,75 +562,113 @@ $(document).ready(function () {
     }
 
     function renderAppointmentActions(status, paymentStatus) {
+
         let html = '';
 
-        switch (status) {
-            // =====================
-            // PENDING
-            // =====================
-            case 'pending':
-                html = `
-                    <div class="d-flex flex-wrap gap-2">
-                        <button type="button" class="btn btn-outline-success" id="btnConfirmAppointment">
-                            <i class="bi bi-cash-coin me-1"></i>
-                            Mark as Confirmed
-                        </button>
+        const isPaid = paymentStatus === 'paid';
+        const isPending = status === 'pending';
+        const isConfirmed = status === 'confirmed';
+        const isCancelled = status === 'cancelled';
+        const isCompleted = status === 'completed';
 
-                        <button type="button" class="btn btn-outline-success" id="btnPayAppointment">
-                            <i class="bi bi-cash-coin me-1"></i>
-                            Mark as Paid
-                        </button>
+        // =====================
+        // PENDING
+        // =====================
+        if (isPending) {
+            html = `
+            <div class="d-flex flex-wrap gap-2">
 
-                        <button type="button" class="btn btn-outline-danger" id="btnCancelAppointment">
-                            <i class="bi bi-x-circle me-1"></i>
-                            Cancel Appointment
-                        </button>
+                <button type="button" class="btn btn-outline-success" id="btnConfirmAppointment">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Mark as Confirmed
+                </button>
 
-                    </div>
-                `;
-                break;
+                <button type="button" class="btn btn-primary" id="btnPayAppointment">
+                    <i class="bi bi-cash-coin me-1"></i>
+                    Mark as Paid
+                </button>
 
-            // =====================
-            // CONFIRMED
-            // =====================
-            case 'confirmed':
-                html = `
-                    <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-outline-danger" id="btnCancelAppointment">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancel Appointment
+                </button>
 
-                        <button type="button" class="btn btn-success" id="btnCompleteAppointment">
-                            <i class="bi bi-check-circle me-1"></i>
-                            Mark as Completed
-                        </button>
+            </div>
+        `;
+        }
 
-                        <button type="button" class="btn btn-outline-danger" id="btnCancelAppointment">
-                            <i class="bi bi-x-circle me-1"></i>
-                            Cancel Appointment
-                        </button>
+        // =====================
+        // CONFIRMED
+        // =====================
+        if (isConfirmed) {
 
-                    </div>
-                `;
-                break;
+            html = `
+            <div class="d-flex flex-wrap gap-2">
 
-            // =====================
-            // CANCELLED
-            // =====================
-            case 'cancelled':
-                html = `
-                    <div class="d-flex flex-wrap gap-2">
+                ${!isPaid ? `
+                    <button type="button" class="btn btn-primary" id="btnPayAppointment">
+                        <i class="bi bi-cash-coin me-1"></i>
+                        Mark as Paid
+                    </button>
+                ` : ''}
 
-                        <button type="button" class="btn btn-warning" id="btnRevertAppointment">
-                            <i class="bi bi-arrow-counterclockwise me-1"></i>
-                            Revert to Pending
-                        </button>
+                <button type="button" class="btn btn-success" id="btnCompleteAppointment">
+                    <i class="bi bi-check-circle me-1"></i>
+                    Mark as Completed
+                </button>
 
-                    </div>
-                `;
-                break;
+                <button type="button" class="btn btn-outline-danger" id="btnCancelAppointment">
+                    <i class="bi bi-x-circle me-1"></i>
+                    Cancel Appointment
+                </button>
+
+            </div>
+        `;
+        }
+
+        // =====================
+        // CANCELLED
+        // =====================
+        if (isCancelled) {
+            html = `
+            <div class="d-flex flex-wrap gap-2">
+
+                <button type="button" class="btn btn-warning" id="btnRevertAppointment">
+                    <i class="bi bi-arrow-counterclockwise me-1"></i>
+                    Revert to Pending
+                </button>
+
+            </div>
+        `;
+        }
+
+        // =====================
+        // COMPLETED
+        // =====================
+        if (isCompleted) {
+            html = `
+                <div class="text-muted small">
+                    <i class="bi bi-lock me-1"></i>
+                    This appointment is completed and locked.
+                </div>
+            `;
+        }
+
+        // =====================
+        // PAYMENT INDICATOR
+        // =====================
+        if (isPaid) {
+            html += `
+                <div class="text-success small mt-2">
+                    <i class="bi bi-check-circle-fill me-1"></i>
+                    Payment completed
+                </div>
+            `;
         }
 
         $('#appointmentActions').html(html);
     }
-    
+
     function confirmAndUpdate(title, message, status) {
         alertify.confirm(title, message,
             function () {
@@ -635,32 +678,14 @@ $(document).ready(function () {
                 }).done(response => {
                     alertify.success(response.message);
                     calendar.refetchEvents();
-                    $modal.modal('hide');
+                    renderStatus(status);
+                    renderAppointmentActions(status);
                 }).fail(xhr => {
                     alertify.error(xhr.responseJSON?.error || 'Failed to update status');
                 });
             },
-            function () {}
+            function () { }
         );
-    }
-
-    function updatePaymentStatus(status) {
-        $.ajax({
-            url: App.endpoint('admin/appointments/update_status'),
-            type: 'POST',
-            data: {
-                id: selectedEventId,
-                status: 'confirmed',
-                payment_status: status
-            },
-            success: function (response) {
-                alertify.success(response.message);
-                location.reload();
-            },
-            error: function () {
-                alertify.error('Failed to update payment status');
-            }
-        });
     }
 
     $(document).on('click', '#btnConfirmAppointment', function () {
@@ -668,14 +693,50 @@ $(document).ready(function () {
     });
 
     $(document).on('click', '#btnPayAppointment', function () {
+
+        if (!selectedEventId) return;
+
+        const btn = $(this);
         alertify.confirm(
-            'Payment Confirmation',
-            `Marking this transaction as paid will update this transaction to completed and paid.<br/>
-            Continue?`,
+            'Confirm Payment',
+            `
+                <div class="mb-2">
+                    You are about to mark this appointment as:
+                </div>
+                <div class="alert alert-success py-2 mb-2">
+                    <strong>PAID</strong>
+                </div>
+                <small class="text-muted">
+                    This action will finalize the payment record.
+                </small>
+            `,
             function () {
-                updatePaymentStatus('paid');
+                btn.prop('disabled', true);
+
+                $.ajax({
+                    url: App.endpoint('admin/appointments/update_status'),
+                    type: 'POST',
+                    data: {
+                        id: selectedEventId,
+                        status: 'confirmed',
+                        payment_status: 'paid'
+                    },
+                    success: function (response) {
+                        alertify.success(response.message);
+                        calendar.refetchEvents();
+                        renderPaymentStatus('paid');
+                        renderStatus('confirmed');
+                        renderAppointmentActions('confirmed', 'paid');
+                    },
+                    error: function (xhr) {
+                        alertify.error(xhr.responseJSON?.error || 'Failed to update status');
+                    },
+                    complete: function () {
+                        btn.prop('disabled', false);
+                    }
+                });
             },
-            function () {}
+            function () { }
         );
     });
 

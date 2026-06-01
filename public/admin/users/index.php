@@ -112,7 +112,7 @@ Component::sidebar();
 
                 <div class="table-responsive">
 
-                    <table class="table align-middle" id="usersTable">
+                    <table class="table align-middle small" id="usersTable">
 
                         <thead>
                             <tr>

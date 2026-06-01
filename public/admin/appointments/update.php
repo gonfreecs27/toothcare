@@ -3,7 +3,10 @@ require '../../../init.php';
 Permission::authorize(['admin', 'staff']);
 
 Core::loadModel("Appointment");
+Core::loadModel("Payment");
+
 $appointmentClass = new Appointment();
+$paymentClass = new Payment();
 
 try {
 
@@ -17,9 +20,10 @@ try {
     $status = trim($_POST['status'] ?? 'pending');
     $reason = trim($_POST['reason'] ?? '');
 
-    $services = $_POST['services'] ?? [];
+    $payment_status = $_POST['payment_status'] ?? null;
+    $payment_method = $_POST['payment_method'] ?? 'cash';
 
-    // convert to integers & remove invalid values
+    $services = $_POST['services'] ?? [];
     $services = array_values(array_filter(array_map('intval', $services)));
 
     if (!$id) {
@@ -51,11 +55,16 @@ try {
     }
 
     $appointment = $appointmentClass->find($id);
-    if ($appointment['status'] == 'completed') {
+
+    if (!$appointment) {
+        throw new Exception("Appointment not found.");
+    }
+
+    if ($appointment['status'] === 'completed') {
         throw new Exception("This transaction has already been completed.");
     }
 
-    if ($appointment['status'] == 'cancelled') {
+    if ($appointment['status'] === 'cancelled') {
         throw new Exception("This transaction has already been cancelled.");
     }
 
@@ -73,14 +82,7 @@ try {
     $start = $startDateTime->format('Y-m-d H:i:s');
     $end   = $endDateTime->format('Y-m-d H:i:s');
 
-    $conflict = $appointmentClass->findConflict(
-        $dentist_id,
-        $start,
-        $end,
-        $id
-    );
-
-    if ($conflict) {
+    if ($appointmentClass->findConflict($dentist_id, $start, $end, $id)) {
         throw new Exception('Dentist already has an appointment at this time');
     }
 
@@ -98,6 +100,18 @@ try {
         throw new Exception('Failed to update appointment');
     }
 
+    $payment = $paymentClass->findByAppointment($id);
+
+    // create payment if missing
+    if (!$payment) {
+        $paymentClass->createFromAppointment($id, [
+            'payment_method' => $payment_method,
+            'reference_no' => $paymentClass->generateReferenceNo()
+        ]);
+    }
+
+    $newAmount = $paymentClass->calculateAppointmentAmount($id);
+    $paymentClass->updateAmountByAppointment($id, $newAmount);
     Response::success('Appointment updated successfully');
 } catch (Exception $e) {
     Response::error($e->getMessage(), 422);

@@ -365,7 +365,7 @@ Component::sidebar();
                                             Payment Method
                                         </label>
 
-                                        <select id="paymentMethod" class="form-select">
+                                        <select id="paymentMethod" name="payment_method" class="form-select">
                                             <option value="cash">Cash</option>
                                             <option value="gcash">GCash</option>
                                             <option value="maya">Maya</option>

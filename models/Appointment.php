@@ -43,10 +43,13 @@ class Appointment extends BaseModel {
             SELECT 
                 a.*,
                 CONCAT(p.firstname, ' ', p.lastname) AS patient_name,
-                CONCAT(d.firstname, ' ', d.lastname) AS dentist_name
+                CONCAT(d.firstname, ' ', d.lastname) AS dentist_name,
+                pmt.payment_method,
+                pmt.amount AS payment_amount
             FROM appointments a
             JOIN patients p ON p.id = a.patient_id
             JOIN dentists d ON d.id = a.dentist_id
+            LEFT JOIN payments pmt ON pmt.appointment_id = a.id
             $where
             ORDER BY a.appointment_start DESC
         ";
@@ -170,6 +173,15 @@ class Appointment extends BaseModel {
         );
 
         return $result;
+    }
+
+    public function markAsPaid($appointmentId, $paymentData = []) {
+        require_once "Payment.php";
+        $payment = new Payment();
+
+        $paymentId = $payment->createFromAppointment($appointmentId, $paymentData);
+
+        return $paymentId;
     }
 
     public function totalAppointments() {

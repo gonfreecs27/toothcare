@@ -35,7 +35,7 @@ Component::sidebar();
 
                 <div class="table-responsive">
 
-                    <table class="table align-middle" id="patientsTable">
+                    <table class="table align-middle small" id="patientsTable">
 
                         <thead>
                             <tr>

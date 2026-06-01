@@ -90,7 +90,7 @@ Component::sidebar();
 
                 <div class="table-responsive">
 
-                    <table class="table align-middle" id="dentistsTable">
+                    <table class="table align-middle small" id="dentistsTable">
 
                         <thead>
                             <tr>

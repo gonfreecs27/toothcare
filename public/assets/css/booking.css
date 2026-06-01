@@ -1,0 +1,31 @@
+.service-card,
+.dentist-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: .2s;
+    background: #fff;
+}
+
+.service-card:hover,
+.dentist-card:hover {
+    transform: translateY(-2px);
+    border-color: #0d6efd;
+}
+
+.service-card input,
+.dentist-card input {
+    transform: scale(1.2);
+}
+
+.dentist-card.selected {
+    border: 2px solid #0d6efd;
+}
+
+.booking-progress .progress-bar {
+    transition: width .3s ease;
+}

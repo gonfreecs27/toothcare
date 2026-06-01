@@ -33,7 +33,7 @@ Component::sidebar();
 
                 <div class="table-responsive">
 
-                    <table class="table align-middle" id="feedbackTable">
+                    <table class="table align-middle small" id="feedbackTable">
 
                         <thead>
                             <tr>
