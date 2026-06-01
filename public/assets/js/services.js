@@ -30,11 +30,10 @@ $(document).ready(function () {
             duration,
             sort
         }, function (response) {
+            services = response.data.data;
 
-            services = response.data;
-
-            currentPage = response.pagination.page;
-            lastPage = response.pagination.pages;
+            currentPage = response.data.pagination.page;
+            lastPage = response.data.pagination.pages;
 
             renderServices();
             renderPagination();
