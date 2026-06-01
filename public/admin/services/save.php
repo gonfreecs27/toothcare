@@ -1,14 +1,6 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['admin'])) {
-    http_response_code(401);
-    echo json_encode([
-        'error' => 'Unauthorized'
-    ]);
-    exit;
-}
+Permission::authorize(['admin']);
 
 try {
     Core::loadModel("Service");
@@ -46,25 +38,12 @@ try {
 
         $serviceClass->update($id, $data);
 
-        echo json_encode([
-            'success' => true,
-            'message' => 'Service updated successfully'
-        ]);
-        exit;
+        Response::success('Service updated successfully');
     }
 
     $service_id = $serviceClass->create($data);
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Service created successfully',
-        'id' => $service_id
-    ]);
+    Response::success('Service created successfully', ['id' => $service_id]);
 } catch (Exception $e) {
-
-    http_response_code(422);
-
-    echo json_encode([
-        'error' => $e->getMessage()
-    ]);
+    Response::error($e->getMessage(), 422);
 }

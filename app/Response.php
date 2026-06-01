@@ -31,7 +31,8 @@ class Response {
     public static function error($message = 'Error', $httpCode = 400) {
         self::json([
             'success' => false,
-            'message' => $message
+            'message' => $message,
+            'error'   => $message
         ], $httpCode);
     }
 }

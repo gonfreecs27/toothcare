@@ -1,35 +1,15 @@
 <?php
 require '../../../init.php';
-
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['admin'])) {
-    http_response_code(403);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Unauthorized access'
-    ]);
-    exit;
-}
+Permission::authorize(['admin']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Invalid request method'
-    ]);
-    exit;
+    Response::error('Invalid request method', 405);
 }
 
 $id = $_POST['id'] ?? null;
 
 if (!$id) {
-    http_response_code(422);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Patient ID is required'
-    ]);
-    exit;
+    Response::error('Patient ID is required', 422);
 }
 
 try {
@@ -40,24 +20,13 @@ try {
     $patient = $patientClass->find($id);
 
     if (!$patient) {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Patient not found'
-        ]);
-        exit;
+        Response::error('Patient not found', 404);
     }
 
     // delete
     $patientClass->delete($id);
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Patient deleted successfully'
-    ]);
+    Response::success('Patient deleted successfully');
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'success' => false,
-        'message' => 'Server error: ' . $e->getMessage()
-    ]);
+    Response::error('Server error: ' . $e->getMessage(), 500);
 }

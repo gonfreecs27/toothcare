@@ -1,12 +1,6 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['admin', 'staff'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+Permission::authorize(['admin', 'staff']);
 
 Core::loadModel("Appointment");
 $appointmentClass = new Appointment();
@@ -56,13 +50,7 @@ try {
         throw new Exception('Failed to update appointment schedule');
     }
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Appointment updated successfully'
-    ]);
+    Response::success('Appointment updated successfully');
 } catch (Exception $e) {
-    http_response_code(422);
-    echo json_encode([
-        'error' => $e->getMessage()
-    ]);
+    Response::error($e->getMessage(), 422);
 }

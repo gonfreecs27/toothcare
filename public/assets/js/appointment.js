@@ -249,11 +249,11 @@ $(document).ready(function () {
     function populateSelect(url, selector, placeholder) {
 
         $.get(url)
-            .done(function (data) {
+            .done(function (response) {
 
                 let options = `<option value="">${placeholder}</option>`;
 
-                data.forEach(item => {
+                response.data.forEach(item => {
                     options += `<option value="${item.id}">${item.name}</option>`;
                 });
 
@@ -296,11 +296,11 @@ $(document).ready(function () {
                     end: fetchInfo.endStr
                 },
                 success: function (response) {
-                    successCallback(response.events);
+                    successCallback(response.data.events);
                     $("div.stat-card").each((a, b) => {
                         $(b).find("h3").html("0");
                     });
-                    $.each(response.tally, (a, b) => {
+                    $.each(response.data.tally, (a, b) => {
                         $(`h3#${a}`).html(b);
                     });
                 },
@@ -469,7 +469,9 @@ $(document).ready(function () {
     // SERVICES
     // =========================
     function loadServices() {
-        $.get(App.endpoint('admin/services/list'), function (response) {
+        $.get(App.endpoint('admin/services/list'),{
+            limit: 1000
+        }, function (response) {
             const $select = $('#services');
 
             if ($select[0].selectize) {
@@ -485,7 +487,7 @@ $(document).ready(function () {
                 placeholder: 'Select services',
                 maxItems: null,
                 create: false,
-                options: response.data,
+                options: response.data.data,
                 render: {
                     option: function (item, escape) {
                         return `

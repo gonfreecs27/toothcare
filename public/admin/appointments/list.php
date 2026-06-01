@@ -1,12 +1,6 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['all'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+Permission::authorize(['all']);
 
 Core::loadModel("Appointment");
 $appointmentClass = new Appointment();
@@ -23,13 +17,10 @@ try {
         $tally[$key] = ($tally[$key] ?? 0) + 1;
     }
 
-    echo json_encode([
-        "events" => $appointments,
-        "tally" => $tally
+    Response::success('Appointments retrieved successfully', [
+        'events' => $appointments,
+        'tally' => $tally
     ]);
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => $e->getMessage()
-    ]);
+    Response::error($e->getMessage(), 500);
 }

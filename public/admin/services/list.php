@@ -1,14 +1,7 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
 
-if (!Permission::hasAccess(['all'])) {
-    http_response_code(401);
-    echo json_encode([
-        'error' => 'Unauthorized'
-    ]);
-    exit;
-}
+Permission::authorize(['admin']);
 
 try {
     Core::loadModel("Service");
@@ -28,12 +21,7 @@ try {
         $sort
     );
 
-    echo json_encode($services);
+    Response::success('Services retrieved successfully', $services);
 } catch (Exception $e) {
-
-    http_response_code(500);
-
-    echo json_encode([
-        'error' => $e->getMessage()
-    ]);
+    Response::error('Failed to fetch services', 500);
 }

@@ -1,12 +1,6 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['admin', 'staff'])) {
-    http_response_code(401);
-    echo json_encode(['error' => 'Unauthorized']);
-    exit;
-}
+Permission::authorize(['admin', 'staff']);
 
 try {
     Core::loadModel("Appointment");
@@ -17,25 +11,19 @@ try {
     $paymentStatus = $_POST['payment_status'] ?? null;
 
     if (!$id || !$status) {
-        http_response_code(422);
-        echo json_encode(['error' => 'Missing required fields']);
-        exit;
+        Response::error('Missing required fields', 422);
     }
 
     $allowedStatuses = ['pending', 'confirmed', 'cancelled', 'completed'];
 
     if (!in_array($status, $allowedStatuses)) {
-        http_response_code(422);
-        echo json_encode(['error' => 'Invalid status']);
-        exit;
+        Response::error('Invalid status', 422);
     }
 
     $appointment = $appointmentClass->find($id);
 
     if (!$appointment) {
-        http_response_code(404);
-        echo json_encode(['error' => 'Appointment not found']);
-        exit;
+        Response::error('Appointment not found', 404);
     }
 
     // =========================
@@ -51,11 +39,7 @@ try {
     ];
 
     if (!in_array($status, $allowedTransitions[$currentStatus])) {
-        http_response_code(403);
-        echo json_encode([
-            'error' => "Cannot change status from {$currentStatus} to {$status}"
-        ]);
-        exit;
+        Response::error("Cannot change status from {$currentStatus} to {$status}", 403);
     }
 
     // =========================
@@ -89,13 +73,7 @@ try {
 
     // Need to add also the payment transaction
 
-    echo json_encode([
-        'message' => 'Appointment status updated successfully'
-    ]);
+    Response::success('Appointment status updated successfully');
 } catch (Exception $e) {
-    http_response_code(500);
-    echo json_encode([
-        'error' => 'Server error',
-        'details' => $e->getMessage()
-    ]);
+    Response::error('Server error', 500);
 }

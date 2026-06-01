@@ -1,14 +1,6 @@
 <?php
 require '../../../init.php';
-header('Content-Type: application/json');
-
-if (!Permission::hasAccess(['admin'])) {
-    http_response_code(401);
-    echo json_encode([
-        'error' => 'Unauthorized'
-    ]);
-    exit;
-}
+Permission::authorize(['admin']);
 
 try {
     Core::loadModel("Service");
@@ -29,15 +21,7 @@ try {
         throw new Exception('Failed to delete service');
     }
 
-    echo json_encode([
-        'success' => true,
-        'message' => 'Service deleted successfully'
-    ]);
+    Response::success('Service deleted successfully');
 } catch (Exception $e) {
-
-    http_response_code(422);
-
-    echo json_encode([
-        'error' => $e->getMessage()
-    ]);
+    Response::error($e->getMessage(), 422);
 }
