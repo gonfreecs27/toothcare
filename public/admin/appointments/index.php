@@ -1,9 +1,6 @@
 <?php
 require '../../../init.php';
-
-if (!Permission::hasAccess(['all'])) {
-    Core::redirect("login");
-}
+Permission::authorize(['all']);
 
 Component::header(false, null, [
     PROJECT_BASE . 'assets/js/appointment.js'

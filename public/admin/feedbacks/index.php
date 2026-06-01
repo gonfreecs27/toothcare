@@ -1,10 +1,7 @@
 <?php
 
 require '../../../init.php';
-
-if (!Permission::hasAccess(['admin', 'staff'])) {
-    Core::redirect("login");
-}
+Permission::authorize(['admin', 'staff']);
 
 Core::loadModel("Feedback");
 

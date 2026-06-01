@@ -1,9 +1,6 @@
 <?php
 require '../../../init.php';
-
-if (!Permission::hasAccess(['all'])) {
-    Core::redirect("login");
-}
+Permission::authorize(['admin']);
 
 Component::header(false, null, [
     PROJECT_BASE . 'assets/js/services.js'

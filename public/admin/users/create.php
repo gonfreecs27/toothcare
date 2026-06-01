@@ -1,9 +1,6 @@
 <?php
 require '../../../init.php';
-
-if (!Permission::hasAccess(['admin'])) {
-    Core::redirect("login");
-}
+Permission::authorize(['admin']);
 
 Core::loadModel("User");
 $userClass = new User();
