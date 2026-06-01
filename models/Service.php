@@ -87,6 +87,12 @@ class Service extends BaseModel {
         ]);
     }
 
+    public function getByIds($ids) {
+        if (empty($ids)) return [];
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        return $this->fetchAll("SELECT * FROM services WHERE id IN ($placeholders)", $ids);
+    }
+
     public function totalServices() {
         return $this->fetch("
             SELECT COUNT(*) AS total

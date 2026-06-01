@@ -7,25 +7,51 @@
     border-radius: 12px;
     padding: 15px;
     cursor: pointer;
-    transition: .2s;
+    transition: all .2s ease;
     background: #fff;
+    position: relative;
 }
 
 .service-card:hover,
 .dentist-card:hover {
     transform: translateY(-2px);
     border-color: #0d6efd;
+    box-shadow: 0 6px 15px rgba(13, 110, 253, 0.08);
 }
 
+/* INPUT */
 .service-card input,
 .dentist-card input {
     transform: scale(1.2);
+    accent-color: #0d6efd;
 }
 
-.dentist-card.selected {
+/* SELECTED STATE */
+.service-card:has(input:checked),
+.dentist-card:has(input:checked) {
     border: 2px solid #0d6efd;
+    background: #f5f9ff;
 }
 
+/* mobile tap feedback */
+.service-card:active,
+.dentist-card:active {
+    transform: scale(0.98);
+}
+
+/* progress bar */
 .booking-progress .progress-bar {
     transition: width .3s ease;
+}
+
+/* disabled slots future-proof */
+.disabled-slot {
+    opacity: 0.4;
+    pointer-events: none;
+}
+
+/* summary styling */
+#summaryBox {
+    font-size: 14px;
+    line-height: 1.5;
 }

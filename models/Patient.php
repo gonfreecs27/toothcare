@@ -10,7 +10,7 @@ class Patient extends BaseModel {
     }
 
     public function create($data) {
-        return $this->execute(
+        $this->execute(
             "INSERT INTO {$this->table}
              (firstname, lastname, birthdate, gender, contact, email, address, civil_status, status)
              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -26,6 +26,8 @@ class Patient extends BaseModel {
                 $data['status']
             ]
         );
+
+        return $this->db()->lastInsertId();
     }
 
     public function update($id, $data) {
@@ -45,6 +47,15 @@ class Patient extends BaseModel {
                 $data['status'],
                 $id
             ]
+        );
+    }
+
+    public function findByEmail($email) {
+        return $this->fetch(
+            "SELECT id FROM {$this->table}
+         WHERE email = ?
+         LIMIT 1",
+            [$email]
         );
     }
 

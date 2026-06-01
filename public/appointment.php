@@ -17,8 +17,6 @@ Component::header(true, null, [
 ]);
 ?>
 
-<link rel="stylesheet" href="<?= PROJECT_BASE ?>/assets/css/booking.css">
-
 <div class="container py-5">
 
     <div class="text-center mb-4">
@@ -43,7 +41,7 @@ Component::header(true, null, [
 
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 booking-form">
 
         <!-- FORM -->
         <div class="col-lg-8">
@@ -64,14 +62,14 @@ Component::header(true, null, [
 
                                     <div class="col-md-6 mb-3">
 
-                                        <label class="service-card">
+                                        <label class="service-card" data-price="<?= $service['price'] ?>">
 
                                             <input type="checkbox" name="services[]" value="<?= $service['id'] ?>">
 
                                             <div>
                                                 <strong><?= htmlspecialchars($service['name']) ?></strong>
                                                 <div class="text-muted">
-                                                    ₱<?= number_format($service['price'], 2) ?>
+                                                    Php <?= number_format($service['price'], 2) ?>
                                                 </div>
                                             </div>
 
@@ -127,16 +125,19 @@ Component::header(true, null, [
 
                             <div class="row">
 
-                                <div class="col-md-6 mb-3">
+                                <div class="col-md-4 mb-3">
                                     <label>Date</label>
                                     <input type="date" id="appointmentDate" name="date" class="form-control" min="<?= date('Y-m-d') ?>">
                                 </div>
 
-                                <div class="col-md-6 mb-3">
-                                    <label>Time</label>
-                                    <select id="appointmentTime" name="time" class="form-select">
-                                        <option>Select date first</option>
-                                    </select>
+                                <div class="col-md-4 mb-3">
+                                    <label>Start Time</label>
+                                    <select id="startTime" name="start_time" class="form-select mb-2"></select>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <label>End Time</label>
+                                    <select id="endTime" name="end_time" class="form-select"></select>
                                 </div>
 
                             </div>
@@ -188,19 +189,17 @@ Component::header(true, null, [
                         <hr>
 
                         <div class="d-flex justify-content-between">
-
                             <button type="button" id="btnPrev" class="btn btn-outline-secondary d-none">
-                                Previous
+                                <i class="bi bi-arrow-left me-1"></i> Previous
                             </button>
 
                             <button type="button" id="btnNext" class="btn btn-primary">
-                                Next
+                                Next <i class="bi bi-arrow-right ms-1"></i>
                             </button>
 
                             <button type="submit" id="btnSubmit" class="btn btn-success d-none">
-                                Book Appointment
+                                <i class="bi bi-calendar-check me-1"></i> Book Appointment
                             </button>
-
                         </div>
 
                     </form>
@@ -213,7 +212,7 @@ Component::header(true, null, [
         <!-- SUMMARY -->
         <div class="col-lg-4">
 
-            <div class="card shadow-sm border-0 sticky-top">
+            <div class="card shadow-sm border-0">
 
                 <div class="card-body">
 
@@ -226,6 +225,18 @@ Component::header(true, null, [
 
                 </div>
 
+            </div>
+
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-calendar-week me-1"></i> Monthly Schedule
+                    </h5>
+                    <hr>
+
+                    <div id="calendar"></div>
+                </div>
             </div>
 
         </div>
