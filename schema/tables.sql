@@ -101,3 +101,30 @@ CREATE TABLE
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         CONSTRAINT fk_payment_appointment FOREIGN KEY (appointment_id) REFERENCES appointments (id) ON DELETE CASCADE
     );
+
+CREATE TABLE feedbacks (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NULL,
+
+    rating TINYINT NOT NULL,
+
+    message TEXT NOT NULL,
+
+    status ENUM('pending', 'approved', 'rejected')
+        DEFAULT 'pending',
+
+    is_featured TINYINT(1)
+        DEFAULT 0,
+
+    ip_address VARCHAR(45) NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_status (status),
+    INDEX idx_rating (rating),
+    INDEX idx_created_at (created_at)
+);

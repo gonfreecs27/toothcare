@@ -1,5 +1,24 @@
 <?php
 require_once(__DIR__ . '/../init.php');
+
+Core::loadModel("Feedback");
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $feedback = new Feedback();
+    $feedback->create([
+        'name'       => trim($_POST['name']),
+        'email'      => trim($_POST['email'] ?? ''),
+        'rating'     => (int) $_POST['rating'],
+        'message'    => trim($_POST['message']),
+        'ip_address' => $_SERVER['REMOTE_ADDR']
+    ]);
+
+    $_SESSION['feedback_success'] = true;
+
+    header('Location: ' . $_SERVER['REQUEST_URI']);
+    exit;
+}
+
 Component::header(true);
 ?>
 
@@ -31,6 +50,15 @@ Component::header(true);
     <div class="row justify-content-center">
 
         <div class="col-lg-7">
+            <?php if (!empty($_SESSION['feedback_success'])): ?>
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Thank you for your feedback! Your submission has been received and is awaiting review.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <?php unset($_SESSION['feedback_success']); ?>
+            <?php endif; ?>
 
             <div class="card feedback-card">
 
