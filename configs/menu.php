@@ -89,16 +89,30 @@ return [
 
         [
             'title' => 'Appointments',
-            'icon'  => 'bi bi-calendar-event-fill',
-            'url'   => 'staff/appointments',
-            'pages' => ['appointments.php']
+            'icon'  => 'bi bi-calendar-week-fill',
+            'url'   => 'admin/appointments',
+            'pages' => ['index.php']
         ],
 
         [
+            'title' => 'Patients',
+            'icon'  => 'bi bi-person-lines-fill',
+            'url'   => 'admin/patients',
+            'pages' => ['index.php']
+        ], 
+
+        [
             'title' => 'Payments',
-            'icon'  => 'bi bi-wallet2',
-            'url'   => 'staff/payments',
+            'icon'  => 'bi bi-cash-stack',
+            'url'   => 'admin/payments',
             'pages' => ['payments.php']
+        ],
+
+        [
+            'title' => 'Feedbacks',
+            'icon'  => 'bi bi-chat-dots-fill',
+            'url'   => 'admin/feedbacks',
+            'pages' => ['feedbacks.php']
         ]
 
     ],

@@ -42,18 +42,22 @@
     flex-shrink: 0;
 }
 
+.card-primary .card-icon,
 .card-patients .card-icon {
     background: linear-gradient(135deg, #0d6efd, #4ea3ff);
 }
 
+.card-success .card-icon,
 .card-dentists .card-icon {
     background: linear-gradient(135deg, #198754, #4fd69c);
 }
 
+.card-pending .card-icon,
 .card-appointments .card-icon {
     background: linear-gradient(135deg, #ffc107, #ffda6a);
 }
 
+.card-danger .card-icon,
 .card-revenue .card-icon {
     background: linear-gradient(135deg, #dc3545, #ff7b88);
 }

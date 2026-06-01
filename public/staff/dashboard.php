@@ -1,45 +1,56 @@
 <?php
-session_start();
+require '../../init.php';
 
-if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'staff') {
-    header("Location: /login.php");
-    exit;
-}
+Permission::authorize(['staff']);
+
+Core::loadModel("Appointment");
+Core::loadModel("Payment");
 
 $user = $_SESSION['user'];
 
-include __DIR__ . '/../../includes/header_app.php';
-include __DIR__ . '/../../includes/sidebar.php';
+$appointmentModel = new Appointment();
+$paymentModel = new Payment();
+
+// =========================
+// STAFF STATS
+// =========================
+$todayAppointments = $appointmentModel->countToday();
+$pendingAppointments = $appointmentModel->countPending();
+$confirmedAppointments = $appointmentModel->countConfirmed();
+
+$paymentsToday = $paymentModel->todayRevenue();
+
+// =========================
+// TODAY SCHEDULE
+// =========================
+$todaySchedule = $appointmentModel->todaySchedule(10);
+
+Component::header();
+Component::sidebar();
 ?>
 
 <div class="main-wrapper">
-
     <div class="content">
 
         <!-- HEADER -->
         <div class="dashboard-header mb-4">
 
             <div>
-
                 <h3 class="fw-bold mb-1">
-                    Staff Dashboard
+                    Welcome back,
+                    <span class="text-primary">
+                        <?= htmlspecialchars($user['name']) ?>
+                    </span>
                 </h3>
 
                 <p class="text-muted mb-0">
-                    Welcome back,
-                    <span class="text-primary fw-semibold">
-                        <?= htmlspecialchars($user['name']) ?>
-                    </span>
+                    Staff operations dashboard overview.
                 </p>
-
             </div>
 
             <div class="dashboard-date">
-
                 <i class="bi bi-calendar3"></i>
-
                 <?= date('F d, Y') ?>
-
             </div>
 
         </div>
@@ -47,88 +58,58 @@ include __DIR__ . '/../../includes/sidebar.php';
         <!-- STATS -->
         <div class="row g-4">
 
-            <div class="col-lg-4 col-md-6">
-
-                <div class="dashboard-card appointments-card">
-
+            <div class="col-lg-3 col-md-6">
+                <div class="dashboard-card card-primary">
                     <div class="card-icon">
                         <i class="bi bi-calendar2-check-fill"></i>
                     </div>
-
-                    <div>
-
-                        <span class="card-title">
-                            Today's Appointments
-                        </span>
-
-                        <h2 class="card-value">
-                            18
-                        </h2>
-
-                        <small class="text-success">
-                            5 upcoming schedules
-                        </small>
-
+                    <div class="card-details">
+                        <span class="card-title">Today's Appointments</span>
+                        <h2 class="card-value"><?= $todayAppointments ?></h2>
+                        <small class="text-muted">Scheduled today</small>
                     </div>
-
                 </div>
-
             </div>
 
-            <div class="col-lg-4 col-md-6">
-
-                <div class="dashboard-card payments-card">
-
+            <div class="col-lg-3 col-md-6">
+                <div class="dashboard-card card-pending">
                     <div class="card-icon">
-                        <i class="bi bi-wallet2"></i>
+                        <i class="bi bi-hourglass-split"></i>
                     </div>
-
-                    <div>
-
-                        <span class="card-title">
-                            Payments Collected
-                        </span>
-
-                        <h2 class="card-value">
-                            ₱12,500
-                        </h2>
-
-                        <small class="text-muted">
-                            Today's collection
-                        </small>
-
+                    <div class="card-details">
+                        <span class="card-title">Pending</span>
+                        <h2 class="card-value"><?= $pendingAppointments ?></h2>
+                        <small class="text-warning">Needs action</small>
                     </div>
-
                 </div>
-
             </div>
 
-            <div class="col-lg-4 col-md-6">
-
-                <div class="dashboard-card patients-card">
-
+            <div class="col-lg-3 col-md-6">
+                <div class="dashboard-card card-success">
                     <div class="card-icon">
-                        <i class="bi bi-people-fill"></i>
+                        <i class="bi bi-check-circle-fill"></i>
                     </div>
-
-                    <div>
-
-                        <span class="card-title">
-                            Waiting Patients
-                        </span>
-
-                        <h2 class="card-value">
-                            7
-                        </h2>
-
-                        <small class="text-warning">
-                            Requires assistance
-                        </small>
-
+                    <div class="card-details">
+                        <span class="card-title">Confirmed</span>
+                        <h2 class="card-value"><?= $confirmedAppointments ?></h2>
+                        <small class="text-primary">Ready for service</small>
                     </div>
-
                 </div>
+            </div>
 
+            <div class="col-lg-3 col-md-6">
+                <div class="dashboard-card card-danger">
+                    <div class="card-icon">
+                        <i class="bi bi-cash-coin"></i>
+                    </div>
+                    <div class="card-details">
+                        <span class="card-title">Payments Today</span>
+                        <h2 class="card-value">
+                            <?= number_format($paymentsToday, 2) ?>
+                        </h2>
+                        <small class="text-success">Collected today</small>
+                    </div>
+                </div>
             </div>
 
         </div>
@@ -136,186 +117,144 @@ include __DIR__ . '/../../includes/sidebar.php';
         <!-- MAIN CONTENT -->
         <div class="row mt-4 g-4">
 
-            <!-- LEFT -->
+            <!-- LEFT PANEL -->
+            <div class="col-lg-4">
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-4">Appointment Overview</h5>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Pending</span>
+                            <strong><?= $pendingAppointments ?></strong>
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Confirmed</span>
+                            <strong><?= $confirmedAppointments ?></strong>
+                        </div>
+
+                        <hr>
+
+                        <h6 class="fw-bold mb-3">Quick Actions</h6>
+
+                        <div class="d-grid gap-2">
+
+                            <a href="<?= PROJECT_BASE ?>staff/appointments"
+                                class="btn btn-outline-primary">
+                                <i class="bi bi-calendar me-2"></i>
+                                Manage Appointments
+                            </a>
+
+                            <a href="<?= PROJECT_BASE ?>staff/payments"
+                                class="btn btn-outline-success">
+                                <i class="bi bi-cash-coin me-2"></i>
+                                Manage Payments
+                            </a>
+
+                            <a href="<?= PROJECT_BASE ?>staff/patients"
+                                class="btn btn-outline-info">
+                                <i class="bi bi-people-fill me-2"></i>
+                                Patient Records
+                            </a>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
             <div class="col-lg-8">
 
-                <div class="card dashboard-panel shadow-sm border-0">
+                <div class="card shadow-sm border-0">
 
                     <div class="card-body">
 
                         <div class="d-flex justify-content-between align-items-center mb-4">
 
                             <div>
-
-                                <h5 class="fw-bold mb-1">
-                                    Today's Schedule
-                                </h5>
-
-                                <p class="text-muted small mb-0">
-                                    Upcoming patient appointments
-                                </p>
-
+                                <h5 class="fw-bold mb-1">Today's Schedule</h5>
+                                <p class="text-muted small mb-0">All clinic appointments</p>
                             </div>
 
-                            <a href="/staff/appointments.php"
+                            <a href="<?= PROJECT_BASE ?>staff/appointments"
                                 class="btn btn-light btn-sm">
-
-                                View All
-
+                                View Calendar
                             </a>
 
                         </div>
 
-                        <div class="schedule-list">
+                        <?php if (empty($todaySchedule)): ?>
 
-                            <div class="schedule-item">
+                            <div class="text-center py-5">
+                                <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                                <p class="text-muted mt-3 mb-0">
+                                    No appointments today.
+                                </p>
+                            </div>
 
-                                <div class="schedule-time">
-                                    9:00 AM
-                                </div>
+                        <?php else: ?>
 
-                                <div class="schedule-info">
+                            <div class="table-responsive">
 
-                                    <div class="fw-semibold">
-                                        Juan Dela Cruz
-                                    </div>
+                                <table class="table align-middle">
 
-                                    <small class="text-muted">
-                                        Dental Cleaning • Dr. Santos
-                                    </small>
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Patient</th>
+                                            <th>Dentist</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
 
-                                </div>
+                                    <tbody>
 
-                                <span class="badge bg-success-subtle text-success">
-                                    Confirmed
-                                </span>
+                                        <?php foreach ($todaySchedule as $row): ?>
+
+                                            <?php
+                                            $badge = [
+                                                'pending' => 'warning',
+                                                'confirmed' => 'primary',
+                                                'completed' => 'success',
+                                                'cancelled' => 'danger'
+                                            ];
+                                            ?>
+
+                                            <tr>
+
+                                                <td>
+                                                    <?= date('h:i A', strtotime($row['appointment_start'])) ?>
+                                                </td>
+
+                                                <td>
+                                                    <?= htmlspecialchars($row['patient_name']) ?>
+                                                </td>
+
+                                                <td>
+                                                    <?= htmlspecialchars($row['dentist_name']) ?>
+                                                </td>
+
+                                                <td>
+                                                    <span class="badge bg-<?= $badge[$row['status']] ?? 'secondary' ?>">
+                                                        <?= ucfirst($row['status']) ?>
+                                                    </span>
+                                                </td>
+
+                                            </tr>
+
+                                        <?php endforeach; ?>
+
+                                    </tbody>
+
+                                </table>
 
                             </div>
 
-                            <div class="schedule-item">
-
-                                <div class="schedule-time">
-                                    10:30 AM
-                                </div>
-
-                                <div class="schedule-info">
-
-                                    <div class="fw-semibold">
-                                        Maria Reyes
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Tooth Extraction • Dr. Cruz
-                                    </small>
-
-                                </div>
-
-                                <span class="badge bg-warning-subtle text-warning">
-                                    Pending
-                                </span>
-
-                            </div>
-
-                            <div class="schedule-item">
-
-                                <div class="schedule-time">
-                                    1:00 PM
-                                </div>
-
-                                <div class="schedule-info">
-
-                                    <div class="fw-semibold">
-                                        Carlo Mendoza
-                                    </div>
-
-                                    <small class="text-muted">
-                                        Consultation • Dr. Santos
-                                    </small>
-
-                                </div>
-
-                                <span class="badge bg-primary-subtle text-primary">
-                                    Ongoing
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- RIGHT -->
-            <div class="col-lg-4">
-
-                <div class="card dashboard-panel shadow-sm border-0 mb-4">
-
-                    <div class="card-body">
-
-                        <h5 class="fw-bold mb-4">
-                            Quick Actions
-                        </h5>
-
-                        <div class="d-grid gap-3">
-
-                            <a href="/staff/appointments.php"
-                                class="quick-action-btn">
-
-                                <i class="bi bi-calendar-plus-fill"></i>
-
-                                <span>
-                                    Manage Appointments
-                                </span>
-
-                            </a>
-
-                            <a href="/staff/payments.php"
-                                class="quick-action-btn">
-
-                                <i class="bi bi-cash-stack"></i>
-
-                                <span>
-                                    Process Payments
-                                </span>
-
-                            </a>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-                <div class="card dashboard-panel shadow-sm border-0">
-
-                    <div class="card-body">
-
-                        <h5 class="fw-bold mb-3">
-                            Staff Notes
-                        </h5>
-
-                        <div class="alert alert-light border">
-
-                            <small class="text-muted">
-
-                                Please verify all patient records before confirming appointments.
-
-                            </small>
-
-                        </div>
-
-                        <div class="alert alert-light border mb-0">
-
-                            <small class="text-muted">
-
-                                End-of-day payment reports must be submitted before 6 PM.
-
-                            </small>
-
-                        </div>
+                        <?php endif; ?>
 
                     </div>
 
@@ -327,6 +266,5 @@ include __DIR__ . '/../../includes/sidebar.php';
 
     </div>
 
-    <?php include __DIR__ . '/../../includes/footer_app.php'; ?>
-
+    <?php Component::footer(); ?>
 </div>
