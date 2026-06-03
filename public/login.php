@@ -71,6 +71,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input type="password" name="password" class="form-control" placeholder="Password" required>
             </div>
 
+            <div class="text-end mb-3">
+                <a class="small" href="<?= PROJECT_BASE ?>password-forgot">
+                    Forgot Password?
+                </a>
+            </div>
+
             <button type="submit" class="btn btn-login w-100 mt-2">
                 <i class="bi bi-box-arrow-in-right"></i> Sign In
             </button>
@@ -78,8 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         </form>
 
         <div class="links">
-            <a href="<?= PROJECT_BASE ?>register">Create Account</a>
             <a href="<?= PROJECT_BASE ?>"><i class="bi bi-arrow-left"></i> Back to Home</a>
+            <a href="<?= PROJECT_BASE ?>register">Create Account</a>
         </div>
 
         <div class="footer">

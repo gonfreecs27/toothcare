@@ -1,0 +1,9 @@
+# Composer dependencies
+/vendor/
+
+# IDE files
+.vscode/
+.idea/
+
+# Other files
+composer.lock

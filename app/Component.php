@@ -44,14 +44,27 @@ class Component {
         return "<div class='alert alert-$type py-2 small'>$message</div>";
     }
 
-    public static function inputIcon($icon, $type, $name, $placeholder) {
+    public static function inputIcon($icon, $type, $name, $placeholder, $value = '') {
         return "
         <div class='input-group mb-2'>
             <span class='input-group-text'>
                 <i class='bi bi-$icon'></i>
             </span>
-            <input type='$type' name='$name' class='form-control' placeholder='$placeholder' required>
+            <input
+                type='$type'
+                name='$name'
+                class='form-control'
+                placeholder='$placeholder'
+                value='" . htmlspecialchars($value, ENT_QUOTES, 'UTF-8') . "'
+                required
+            >
         </div>
         ";
+    }
+
+    public static function getEmailContent($component, $params = []) {
+        extract($params);
+        $content = include __DIR__ . "/emails/" . $component . ".php";
+        return $content;
     }
 }

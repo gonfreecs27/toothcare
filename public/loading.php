@@ -21,6 +21,7 @@ $redirect = $routes[$role] ?? PROJECT_BASE . 'staff/dashboard';
 
 <head>
     <title>Loading <?= BRAND_NAME ?>...</title>
+    <link rel="icon" href="<?= PROJECT_BASE ?>assets/images/icon.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 

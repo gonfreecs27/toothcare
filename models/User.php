@@ -95,4 +95,115 @@ class User extends BaseModel {
 
         return false;
     }
+
+    public function findByEmail($email) {
+        return $this->fetch("
+            SELECT *
+            FROM users
+            WHERE email = ?
+            LIMIT 1
+        ", [$email]);
+    }
+
+    public function validatePassword($password) {
+        $password = trim($password);
+
+        // ---------------------------------
+        // 1. Minimum length check
+        // ---------------------------------
+        if (strlen($password) < 8) {
+            return [
+                'valid' => false,
+                'message' => 'Password must be at least 8 characters long.'
+            ];
+        }
+
+        // ---------------------------------
+        // 2. Maximum length (prevent abuse)
+        // ---------------------------------
+        if (strlen($password) > 72) {
+            return [
+                'valid' => false,
+                'message' => 'Password is too long.'
+            ];
+        }
+
+        // ---------------------------------
+        // 3. Must contain at least 1 lowercase
+        // ---------------------------------
+        if (!preg_match('/[a-z]/', $password)) {
+            return [
+                'valid' => false,
+                'message' => 'Password must contain at least one lowercase letter.'
+            ];
+        }
+
+        // ---------------------------------
+        // 4. Must contain at least 1 uppercase
+        // ---------------------------------
+        if (!preg_match('/[A-Z]/', $password)) {
+            return [
+                'valid' => false,
+                'message' => 'Password must contain at least one uppercase letter.'
+            ];
+        }
+
+        // ---------------------------------
+        // 5. Must contain at least 1 number
+        // ---------------------------------
+        if (!preg_match('/[0-9]/', $password)) {
+            return [
+                'valid' => false,
+                'message' => 'Password must contain at least one number.'
+            ];
+        }
+
+        // ---------------------------------
+        // 6. Must contain at least 1 special character
+        // ---------------------------------
+        if (!preg_match('/[\W_]/', $password)) {
+            return [
+                'valid' => false,
+                'message' => 'Password must contain at least one special character.'
+            ];
+        }
+
+        // ---------------------------------
+        // 7. Block common weak passwords
+        // ---------------------------------
+        $common = [
+            'password',
+            '12345678',
+            'qwerty',
+            'admin123',
+            'password123'
+        ];
+
+        if (in_array(strtolower($password), $common)) {
+            return [
+                'valid' => false,
+                'message' => 'Password is too common. Choose a stronger one.'
+            ];
+        }
+
+        // ---------------------------------
+        // Passed all checks
+        // ---------------------------------
+        return [
+            'valid' => true,
+            'message' => 'Password is strong.'
+        ];
+    }
+
+    public function updatePassword($id, $password) {
+        return $this->execute(
+            "UPDATE {$this->table}
+            SET password = ?
+            WHERE id = ?",
+            [
+                password_hash($password, PASSWORD_BCRYPT),
+                $id
+            ]
+        );
+    }
 }
