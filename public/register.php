@@ -44,15 +44,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $error = "Password must be at least 8 characters long.";
 
     } else {
-
-        $userModel->create([
-            'name' => $name,
-            'email' => $email,
-            'password' => $password,
-            'role' => 'staff'
-        ]);
-
-        $success = "Account created successfully.";
+        $passwordValidation = $userModel->validatePassword($password);
+        if (!$passwordValidation['valid']) {
+            $error = $passwordValidation['message'];
+        } else {
+            $userModel->create([
+                'name' => $name,
+                'email' => $email,
+                'password' => $password,
+                'role' => 'staff'
+            ]);
+            $success = "Account created successfully.";
+        }
     }
 }
 
@@ -78,8 +81,8 @@ Component::header(true);
 
         <form method="POST">
 
-            <?= Component::inputIcon('person', 'text', 'name', 'Full Name') ?>
-            <?= Component::inputIcon('envelope', 'email', 'email', 'Email Address') ?>
+            <?= Component::inputIcon('person', 'text', 'name', 'Full Name', $name ?? '') ?>
+            <?= Component::inputIcon('envelope', 'email', 'email', 'Email Address', $email ?? '') ?>
             <?= Component::inputIcon('lock', 'password', 'password', 'Password') ?>
             <?= Component::inputIcon('shield-lock', 'password', 'confirm_password', 'Confirm Password') ?>
 

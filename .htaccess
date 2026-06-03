@@ -43,7 +43,7 @@ RewriteRule ^api/(.+)\.php$ api/$1 [R=301,L]
 # =========================
 # 5. BLOCK DIRECT ACCESS TO INTERNAL STRUCTURE
 # =========================
-RewriteRule ^(app|models|configs|schema)(/|$) - [R=404,L]
+RewriteRule ^(app|models|configs|schema|vendor)(/|$) - [R=404,L]
 
 # =========================
 # 6. ROOT 404 HANDLER

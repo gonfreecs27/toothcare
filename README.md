@@ -1,89 +1,328 @@
-# ToothCare: Dental Clinic System
+# ToothCare Dental Clinic Management System
 
-## Local Development Setup (XAMPP Virtual Host)
+## Overview
 
-This guide will help you configure your local environment so your project runs using a clean URL like:
+ToothCare is a web-based Dental Clinic Management System designed to streamline clinic operations, appointment scheduling, patient management, billing, and dental service records.
 
-`http://toothcare.test`
-
----
-
-# Project Structure
-
-Make sure your project is inside XAMPP `htdocs`.
-
-Important: Only the `public` folder should be accessible from the browser.
+The system provides an intuitive interface for clinic staff, dentists, and administrators to efficiently manage daily dental clinic activities.
 
 ---
 
-# Step 1: Enable Virtual Hosts
+## Features
 
-Open this file:
+### Patient Management
 
+* Patient registration and profile management
+* Medical and dental history tracking
+* Patient search and records viewing
+
+### Appointment Management
+
+* Appointment scheduling
+* Calendar-based appointment monitoring
+* Appointment rescheduling and cancellation
+* Dentist assignment
+
+### Dentist Management
+
+* Dentist profile management
+* Schedule management
+* Appointment allocation
+
+### Service Management
+
+* Dental service catalog
+* Service pricing configuration
+* Treatment tracking
+
+### Payment Management
+
+* Payment recording
+* Transaction history
+* Billing management
+
+### Feedback Management
+
+* Patient feedback submission
+* Feedback monitoring and reporting
+
+### User Management
+
+* User authentication
+* Role-based access control
+* Account management
+
+---
+
+## Technology Stack
+
+### Backend
+
+* PHP 8+
+* MySQL / MariaDB
+
+### Frontend
+
+* HTML5
+* CSS3
+* Bootstrap 3
+* JavaScript
+* jQuery
+* FullCalendar
+
+### Architecture
+
+* MVC (Model-View-Controller)
+* REST-like API Endpoints
+
+---
+
+## Project Structure
+
+```text
+toothcare/
+│
+├── api/
+│   ├── appointments/
+│   ├── dentists/
+│   ├── feedbacks/
+│   ├── patients/
+│   ├── services/
+│   └── users/
+│
+├── app/
+│   ├── Controllers/
+│   ├── Core/
+│   ├── Middleware/
+│   ├── Routes/
+│   └── Views/
+│
+├── configs/
+│   ├── app.php
+│   ├── database.php
+│   └── routes.php
+│
+├── models/
+│   ├── Appointment.php
+│   ├── Dentist.php
+│   ├── Patient.php
+│   ├── Payment.php
+│   ├── Service.php
+│   └── User.php
+│
+├── public/
+│   ├── assets/
+│   ├── css/
+│   ├── js/
+│   ├── uploads/
+│   └── index.php
+│
+├── schema/
+│   └── toothcare.sql
+│
+├── .htaccess
+├── init.php
+└── README.md
 ```
-C:\xampp\apache\conf\extra\httpd-vhosts.conf
-```
 
 ---
 
-# Step 2: Add Virtual Host
+## Installation
 
-Add this configuration at the bottom:
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/your-organization/toothcare.git
+cd toothcare
+```
+
+### 2. Configure Database
+
+Create a database:
+
+```sql
+CREATE DATABASE toothcare;
+```
+
+Import schema:
+
+```bash
+mysql -u root -p toothcare < schema/toothcare.sql
+```
+
+### 3. Configure Application
+
+Edit database configuration:
+
+```php
+configs/database.php
+```
+
+Example:
+
+```php
+return [
+    'host' => 'localhost',
+    'database' => 'toothcare',
+    'username' => 'root',
+    'password' => '',
+];
+```
+
+### 4. Configure Web Server
+
+Ensure Apache mod_rewrite is enabled.
+
+Example Apache Virtual Host:
 
 ```apache
-<VirtualHost *:80>
-    ServerName localhost
-    DocumentRoot "C:/xampp/htdocs"
+DocumentRoot /path/to/toothcare/public
 
-    <Directory "C:/xampp/htdocs">
-        Options Indexes FollowSymLinks Includes ExecCGI
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+<Directory /path/to/toothcare/public>
+    AllowOverride All
+    Require all granted
+</Directory>
+```
 
-<VirtualHost *:80>
-    DocumentRoot "C:/xampp/htdocs/toothcare/public"
-    ServerName toothcare.test
+### 5. Access Application
 
-    <Directory "C:/xampp/htdocs/toothcare/public">
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+```text
+http://localhost/toothcare
 ```
 
 ---
 
-# Step 3: Update Hosts File
+## API Endpoints
 
-Open Notepad as Administrator and edit:
+### Appointments
 
-```
-C:\Windows\System32\drivers\etc\hosts
+| Method | Endpoint                 |
+| ------ | ------------------------ |
+| GET    | /api/appointments/list   |
+| POST   | /api/appointments/create |
+| POST   | /api/appointments/update |
+| POST   | /api/appointments/delete |
+
+### Patients
+
+| Method | Endpoint             |
+| ------ | -------------------- |
+| GET    | /api/patients/list   |
+| POST   | /api/patients/create |
+| POST   | /api/patients/update |
+| POST   | /api/patients/delete |
+
+### Dentists
+
+| Method | Endpoint             |
+| ------ | -------------------- |
+| GET    | /api/dentists/list   |
+| POST   | /api/dentists/create |
+| POST   | /api/dentists/update |
+| POST   | /api/dentists/delete |
+
+### Services
+
+| Method | Endpoint             |
+| ------ | -------------------- |
+| GET    | /api/services/list   |
+| POST   | /api/services/create |
+| POST   | /api/services/update |
+| POST   | /api/services/delete |
+
+### Payments
+
+| Method | Endpoint             |
+| ------ | -------------------- |
+| GET    | /api/payments/list   |
+| POST   | /api/payments/create |
+
+---
+
+## User Roles
+
+### Administrator
+
+* Manage users
+* Manage dentists
+* Manage services
+* Manage appointments
+* Access reports
+
+### Staff
+
+* Manage appointments
+* Manage patients
+* Process payments
+
+### Dentist
+
+* View appointments
+* Manage patient treatments
+* Update treatment records
+
+---
+
+## Security
+
+* Session-based authentication
+* Role-based authorization
+* CSRF protection
+* Input validation and sanitization
+* Prepared SQL statements
+* Secure password hashing
+
+---
+
+## Development Guidelines
+
+### Naming Conventions
+
+#### Controllers
+
+```php
+AppointmentController.php
+PatientController.php
+DentistController.php
 ```
 
-Add this line:
+#### Models
+
+```php
+Appointment.php
+Patient.php
+Dentist.php
 ```
-127.0.0.1 toothcare.test
+
+#### API Endpoints
+
+```text
+/api/appointments/list
+/api/appointments/create
+/api/patients/list
+/api/services/list
 ```
 
 ---
 
-# Step 4: Restart Apache
+## Future Enhancements
 
-Go to XAMPP Control Panel:
-
-Stop Apache
-
-Start Apache again
+* SMS notifications
+* Email notifications
+* Online appointment booking
+* Electronic prescriptions
+* Dental charting
+* Inventory management
+* Reports and analytics dashboard
 
 ---
 
-# Step 5: Access Your Project
+## License
 
-Open your browser:
+This project is intended for academic and internal clinic management purposes.
 
-```
-http://toothcare.test
-```
+---
+
+## Author
+
+Developed by the ToothCare Development Team.
