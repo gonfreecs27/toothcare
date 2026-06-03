@@ -139,32 +139,23 @@ Component::sidebar();
                 'Delete Patient',
                 'Are you sure you want to delete <b>' + name + '</b>? This action cannot be undone.',
                 function() {
-
                     $.ajax({
-                        url: "<?= PROJECT_BASE ?>admin/patients/delete",
+                        url: App.api("patients/delete"),
                         type: 'POST',
                         dataType: 'json',
                         data: {
                             id: id
                         },
-
-                        success: function(res) {
-
-                            if (res.success) {
-
-                                alertify.success(res.message || 'Patient deleted');
-
-                                // remove from DataTable properly
+                        success: function(response) {
+                            if (response.success) {
+                                alertify.success(response.message || 'Patient deleted');
                                 table.row(row).remove().draw(false);
-
                             } else {
-                                alertify.error(res.message || 'Failed to delete');
+                                alertify.error(response.message || 'Failed to delete');
                             }
                         },
-
                         error: function(xhr) {
                             let msg = 'Server error';
-
                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                 msg = xhr.responseJSON.message;
                             }
@@ -172,7 +163,6 @@ Component::sidebar();
                             alertify.error(msg);
                         }
                     });
-
                 },
                 function() {
                     // Do nothing
@@ -181,9 +171,7 @@ Component::sidebar();
                 ok: 'Delete',
                 cancel: 'Cancel'
             });
-
         });
-
     });
 </script>
 

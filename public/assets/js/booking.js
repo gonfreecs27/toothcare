@@ -234,7 +234,7 @@ $(document).ready(function () {
         }
 
         $.ajax({
-            url: App.endpoint('admin/appointments/book'),
+            url: App.api('appointments/book'),
             type: 'POST',
             data: $(this).serialize(),
             success: function () {
@@ -294,7 +294,7 @@ $(document).ready(function () {
 
         events: function (fetchInfo, successCallback, failureCallback) {
             $.ajax({
-                url: App.endpoint('admin/appointments/list-public'),
+                url: App.api('appointments/list-public'),
                 method: 'POST',
                 data: {
                     start: fetchInfo.startStr,

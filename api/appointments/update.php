@@ -1,5 +1,5 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 Permission::authorize(['admin', 'staff', 'dentist']);
 
 Core::loadModel("Appointment");

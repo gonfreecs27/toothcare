@@ -1,5 +1,5 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 
 Core::loadModel("Appointment");
 $appointmentClass = new Appointment();

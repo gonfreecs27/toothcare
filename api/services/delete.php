@@ -1,11 +1,15 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 Permission::authorize(['admin']);
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::error('Invalid request method', 405);
+}
 
 try {
     Core::loadModel("Service");
     $serviceClass = new Service();
-    $id = trim($_GET['id'] ?? '');
+    $id = trim($_POST['id'] ?? '');
 
     if (!$id) {
         throw new Exception('Service ID is required');

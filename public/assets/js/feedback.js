@@ -35,7 +35,7 @@ $(document).ready(function () {
             'Approve this feedback?',
             function () {
                 $.post(
-                    App.endpoint('admin/feedbacks/approve'),
+                    App.api('feedbacks/approve'),
                     { id: id },
                     function (res) {
                         if (res.success) {
@@ -62,7 +62,7 @@ $(document).ready(function () {
             'Reject this feedback?',
             function () {
                 $.post(
-                    App.endpoint('admin/feedbacks/reject'),
+                    App.api('feedbacks/reject'),
                     { id: id },
                     function (res) {
                         if (res.success) {
@@ -85,7 +85,7 @@ $(document).ready(function () {
     $(document).on('click', '.btn-feature', function () {
         let id = $(this).data('id');
         $.post(
-            App.endpoint('admin/feedbacks/feature'),
+            App.api('feedbacks/feature'),
             { id: id },
             function (res) {
                 if (res.success) {

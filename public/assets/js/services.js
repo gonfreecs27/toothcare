@@ -23,7 +23,7 @@ $(document).ready(function () {
         const duration = $('#filterDuration').val();
         const sort = $('#sortServices').val();
 
-        $.get(App.endpoint('admin/services/list'), {
+        $.get(App.api('services/list'), {
             page,
             limit: 12,
             search,
@@ -106,9 +106,9 @@ $(document).ready(function () {
 
                                 <span class="badge bg-success">
                                     Php ${Number(service.price).toLocaleString('en-PH', {
-                                        minimumFractionDigits: 2,
-                                        maximumFractionDigits: 2
-                                    })}
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            })}
                                 </span>
 
                                 <span class="badge bg-light text-dark border">
@@ -172,7 +172,7 @@ $(document).ready(function () {
 
     $('#btnSaveService').on('click', function () {
         $.ajax({
-            url: App.endpoint('admin/services/save'),
+            url: App.api('services/save'),
             type: 'POST',
             data: $form.serialize(),
             success() {
@@ -207,8 +207,9 @@ $(document).ready(function () {
             'Are you sure you want to delete this service?',
             function () {
                 $.ajax({
-                    url: App.endpoint(`admin/services/delete?id=${id}`),
-                    type: 'DELETE',
+                    url: App.api(`services/delete`),
+                    type: 'POST',
+                    data: { id },
                     success() {
                         loadServices(currentPage);
                         alertify.success('Service deleted');

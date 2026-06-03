@@ -1,6 +1,10 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 Permission::authorize(['admin']);
+
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    Response::error('Invalid request method', 405);
+}
 
 try {
     Core::loadModel("Service");

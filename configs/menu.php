@@ -18,7 +18,6 @@ return [
                 'index.php',
                 'create.php',
                 'edit.php',
-                'delete.php'
             ]
         ],
 

@@ -1,5 +1,5 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 Permission::authorize(['admin', 'staff', 'dentist']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -14,7 +14,9 @@ if (!$id) {
 
 try {
     Core::loadModel("Patient");
+    Core::loadModel("Appointment");
     $patientClass = new Patient();
+    $appointmentClass = new Appointment();
 
     // check if exists first
     $patient = $patientClass->find($id);
@@ -23,7 +25,11 @@ try {
         Response::error('Patient not found', 404);
     }
 
-    // delete
+    if ($appointmentClass->getPatientAppointments($id)) {
+        Response::error('Cannot delete patient with existing appointments', 422);
+    }
+
+    // Delete
     $patientClass->delete($id);
 
     Response::success('Patient deleted successfully');

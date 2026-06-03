@@ -1,12 +1,13 @@
 RewriteEngine On
 
 # =========================
-# 1. ALLOW ONLY ROOT + PUBLIC
+# 1. ALLOW ONLY ROOT + PUBLIC + API
 # =========================
 
-# Allow root (index.php) and /public
+# Allow root (index.php), /public, and /api
 RewriteCond %{REQUEST_URI} !^/toothcare/?$
 RewriteCond %{REQUEST_URI} !^/toothcare/public/
+RewriteCond %{REQUEST_URI} !^/toothcare/api/
 RewriteRule ^ - [R=404,L]
 
 # =========================
@@ -21,7 +22,7 @@ Options -MultiViews
 DirectoryIndex index.php
 
 # =========================
-# 4. CLEAN URL SUPPORT (ONLY INSIDE /public)
+# 4. CLEAN URL SUPPORT (ONLY INSIDE /public and /api)
 # =========================
 RewriteCond %{REQUEST_URI} ^/toothcare/public/
 RewriteCond %{REQUEST_FILENAME}.php -f
@@ -30,6 +31,14 @@ RewriteRule ^public/(.+?)/?$ public/$1.php [L]
 # Redirect .php inside public to clean URL
 RewriteCond %{THE_REQUEST} \s/+toothcare/public/(.+?)\.php[\s?] [NC]
 RewriteRule ^public/(.+)\.php$ public/$1 [R=301,L]
+
+RewriteCond %{REQUEST_URI} ^/toothcare/api/
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^api/(.+?)/?$ api/$1.php [L]
+
+# Redirect .php inside api to clean URL
+RewriteCond %{THE_REQUEST} \s/+toothcare/api/(.+?)\.php[\s?] [NC]
+RewriteRule ^api/(.+)\.php$ api/$1 [R=301,L]
 
 # =========================
 # 5. BLOCK DIRECT ACCESS TO INTERNAL STRUCTURE

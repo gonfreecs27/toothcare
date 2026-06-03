@@ -80,6 +80,36 @@ class Appointment extends BaseModel {
         return $events;
     }
 
+    public function getPatientAppointments($patientId, $limit = 10) {
+        return $this->fetchAll("
+            SELECT
+                a.*,
+                CONCAT(p.firstname,' ',p.lastname) AS patient_name,
+                CONCAT(d.firstname,' ',d.lastname) AS dentist_name
+            FROM appointments a
+            JOIN patients p ON p.id = a.patient_id
+            JOIN dentists d ON d.id = a.dentist_id
+            WHERE a.patient_id = ?
+            ORDER BY a.appointment_start ASC
+            LIMIT {$limit}
+        ", [$patientId]);
+    }
+
+    public function getDentistAppointments($dentistId, $limit = 10) {
+        return $this->fetchAll("
+            SELECT
+                a.*,
+                CONCAT(p.firstname,' ',p.lastname) AS patient_name,
+                CONCAT(d.firstname,' ',d.lastname) AS dentist_name
+            FROM appointments a
+            JOIN patients p ON p.id = a.patient_id
+            JOIN dentists d ON d.id = a.dentist_id
+            WHERE a.dentist_id = ?
+            ORDER BY a.appointment_start ASC
+            LIMIT {$limit}
+        ", [$dentistId]);
+    }
+
     public function create($data) {
         $this->execute("
             INSERT INTO appointments

@@ -159,12 +159,13 @@ Component::sidebar();
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
 
-                                            <a href="#"
+                                            <button
+                                                type="button"
                                                 class="btn btn-danger btn-sm btn-delete-dentist"
                                                 data-id="<?= $row['id'] ?>"
                                                 data-name="<?= htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) ?>">
                                                 <i class="bi bi-trash"></i>
-                                            </a>
+                                            </button>
 
                                         </div>
                                     </td>
@@ -191,23 +192,45 @@ Component::sidebar();
 <!-- JS -->
 <script>
     $(document).ready(function() {
-        $('#dentistsTable').DataTable({
+        let table = $('#dentistsTable').DataTable({
             responsive: true,
             pageLength: 10,
             ordering: true
         });
 
-        $(document).on('click', '.btn-delete-dentist', function(e) {
-            e.preventDefault();
-
+        $(document).on('click', '.btn-delete-dentist', function() {
             let id = $(this).data('id');
             let name = $(this).data('name');
+            let row = $(this).closest('tr');
 
             alertify.confirm(
                 'Delete Dentist',
-                'Are you sure you want to delete <b>' + name + '</b>?',
+                'Are you sure you want to delete <b>' + name + '</b>? This action cannot be undone.',
                 function() {
-                    window.location.href = '<?= PROJECT_BASE ?>admin/dentists/delete?id=' + id;
+                    $.ajax({
+                        url: App.api("dentists/delete"),
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: id
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alertify.success(response.message);
+                                table.row(row).remove().draw(false);
+                            } else {
+                                alertify.error(response.message || 'Failed to delete dentist');
+                            }
+                        },
+                        error: function(xhr) {
+                            let msg = 'Server error';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+
+                            alertify.error(msg);
+                        }
+                    });
                 },
                 function() { }
             ).set('labels', {
@@ -215,7 +238,6 @@ Component::sidebar();
                 cancel: 'Cancel'
             });
         });
-
     });
 </script>
 

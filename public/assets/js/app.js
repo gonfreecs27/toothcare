@@ -7,6 +7,7 @@ window.App = (function () {
 
     const config = {
         baseUrl: "/toothcare/public/",
+        baseApi: "/toothcare/api/",
         version: "1.0.0"
     };
 
@@ -18,9 +19,14 @@ window.App = (function () {
         return config.baseUrl + url;
     }
 
+    function api(url) {
+        return config.baseApi + url;
+    }
+
     return {
         init,
         endpoint,
+        api,
         config
     };
 

@@ -292,7 +292,7 @@ $(document).ready(function () {
 
         events: function (fetchInfo, successCallback, failureCallback) {
             $.ajax({
-                url: App.endpoint('admin/appointments/list'),
+                url: App.api('appointments/list'),
                 method: 'POST',
                 data: {
                     start: fetchInfo.startStr,
@@ -383,8 +383,8 @@ $(document).ready(function () {
 
         $.ajax({
             url: selectedEventId
-                ? App.endpoint('admin/appointments/update')
-                : App.endpoint('admin/appointments/create'),
+                ? App.api('appointments/update')
+                : App.api('appointments/create'),
 
             type: 'POST',
             data: $.param(formData),
@@ -452,12 +452,12 @@ $(document).ready(function () {
 
     function updateAppointmentSchedule(event, revertCallback) {
         $.ajax({
-            url: App.endpoint('admin/appointments/update_schedule'),
+            url: App.api('appointments/update_schedule'),
             type: 'POST',
             data: {
                 id: event.id,
-                start: event.start.toISOString(),
-                end: event.end.toISOString(),
+                start: event.startStr,
+                end: event.endStr,
             },
             success(response) {
                 alertify.success(response.message);
@@ -473,7 +473,7 @@ $(document).ready(function () {
     // SERVICES
     // =========================
     function loadServices() {
-        $.get(App.endpoint('admin/services/list'), {
+        $.get(App.api('services/list'), {
             limit: 1000
         }, function (response) {
             const $select = $('#services');
@@ -671,7 +671,7 @@ $(document).ready(function () {
     function confirmAndUpdate(title, message, status) {
         alertify.confirm(title, message,
             function () {
-                $.post(App.endpoint('admin/appointments/update_status'), {
+                $.post(App.api('appointments/update_status'), {
                     id: selectedEventId,
                     status: status
                 }).done(response => {
@@ -713,7 +713,7 @@ $(document).ready(function () {
                 btn.prop('disabled', true);
 
                 $.ajax({
-                    url: App.endpoint('admin/appointments/update_status'),
+                    url: App.api('appointments/update_status'),
                     type: 'POST',
                     data: {
                         id: selectedEventId,
@@ -755,13 +755,13 @@ $(document).ready(function () {
     // INIT
     // =========================
     populateSelect(
-        App.endpoint('admin/patients/list'),
+        App.api('patients/list'),
         'select[name="patient_id"]',
         'Select Patient'
     );
 
     populateSelect(
-        App.endpoint('admin/dentists/list'),
+        App.api('dentists/list'),
         'select[name="dentist_id"]',
         'Select Dentist'
     );

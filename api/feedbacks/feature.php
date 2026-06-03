@@ -1,6 +1,5 @@
 <?php
-
-require '../../../init.php';
+require '../../init.php';
 
 Permission::authorize(['admin']);
 

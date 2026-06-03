@@ -157,12 +157,13 @@ Component::sidebar();
                                                 <i class="bi bi-pencil-square"></i>
                                             </a>
 
-                                            <a href="#"
+                                            <button
+                                                type="button"
                                                 class="btn btn-danger btn-sm btn-delete-user"
                                                 data-id="<?= $row['id'] ?>"
                                                 data-name="<?= htmlspecialchars($row['name']) ?>">
                                                 <i class="bi bi-trash"></i>
-                                            </a>
+                                            </button>
                                         </div>
                                     </td>
                                 </tr>
@@ -178,26 +179,49 @@ Component::sidebar();
 
 <script>
     $(document).ready(function() {
-        $('#usersTable').DataTable({
+        let table = $('#usersTable').DataTable({
             responsive: true,
             pageLength: 10,
             ordering: true
         });
 
-        $('.btn-delete-user').on('click', function (e) {
-            e.preventDefault();
+        $('.btn-delete-user').on('click', function() {
             let userId = $(this).data('id');
             let userName = $(this).data('name');
+            let row = $(this).closest('tr');
             let deleteUrl = '<?= PROJECT_BASE ?>admin/users/delete?id=' + userId;
 
             alertify.confirm(
                 'Delete User',
-                'Are you sure you want to delete <b>' + userName + '</b>?',
-                function () {
-                    window.location.href = deleteUrl;
+                'Are you sure you want to delete <b>' + userName + '</b>? This action cannot be undone.',
+                function() {
+                    $.ajax({
+                        url: App.api("users/delete"),
+                        type: 'POST',
+                        dataType: 'json',
+                        data: {
+                            id: userId
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alertify.success(response.message);
+                                table.row(row).remove().draw(false);
+                            } else {
+                                alertify.error(response.message || 'Failed to delete user');
+                            }
+                        },
+                        error: function(xhr) {
+                            let msg = 'Server error';
+                            if (xhr.responseJSON && xhr.responseJSON.message) {
+                                msg = xhr.responseJSON.message;
+                            }
+
+                            alertify.error(msg);
+                        }
+                    });
                 },
-                function () {
-                    alertify.error('Cancelled');
+                function() {
+                    // Do nothing
                 }
             ).set('labels', {
                 ok: 'Delete',

@@ -1,5 +1,5 @@
 <?php
-require '../../../init.php';
+require '../../init.php';
 Permission::authorize(['admin', 'staff', 'dentist']);
 
 Core::loadModel("Appointment");
@@ -27,6 +27,14 @@ try {
 
     if (strtotime($end) <= strtotime($start)) {
         throw new Exception('End time must be greater than start time');
+    }
+
+    if ($appointment['status'] === 'completed') {
+        throw new Exception("This transaction has already been completed.");
+    }
+
+    if ($appointment['status'] === 'cancelled') {
+        throw new Exception("This transaction has already been cancelled.");
     }
 
     $conflict = $appointmentClass->findConflict(
