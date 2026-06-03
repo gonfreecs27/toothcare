@@ -17,5 +17,5 @@ define('PROJECT_VERSION', '1.0.0');
 /**
  * Split brand name (useful for styling logos or headers)
  */
-define('BRAND_NAME_FIRST', 'Tooth');
-define('BRAND_NAME_SECOND', 'Care');
+define('BRAND_NAME_FIRST', 'Reyes');
+define('BRAND_NAME_SECOND', 'Cornejo');

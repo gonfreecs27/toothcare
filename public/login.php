@@ -79,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <div class="links">
             <a href="<?= PROJECT_BASE ?>register">Create Account</a>
+            <a href="<?= PROJECT_BASE ?>forget">Forget Password</a>
             <a href="<?= PROJECT_BASE ?>"><i class="bi bi-arrow-left"></i> Back to Home</a>
         </div>
 

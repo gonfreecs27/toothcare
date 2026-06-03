@@ -19,10 +19,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     if (!$name || !$email || !$password || !$confirm) {
         $error = "All fields are required.";
+
     } elseif ($password !== $confirm) {
         $error = "Passwords do not match.";
+
     } elseif ($userModel->login($email)) {
         $error = "Email already exists.";
+
+    } 
+    // PASSWORD STRENGTH VALIDATION
+    elseif (!preg_match('/[A-Z]/', $password)) {
+        $error = "Password must contain at least one uppercase letter.";
+
+    } elseif (!preg_match('/[a-z]/', $password)) {
+        $error = "Password must contain at least one lowercase letter.";
+
+    } elseif (!preg_match('/[0-9]/', $password)) {
+        $error = "Password must contain at least one number.";
+
+    } elseif (!preg_match('/[\W_]/', $password)) {
+        $error = "Password must contain at least one special character.";
+
+    } elseif (strlen($password) < 8) {
+        $error = "Password must be at least 8 characters long.";
+
     } else {
 
         $userModel->create([
